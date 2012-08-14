@@ -54,7 +54,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 			conf = args[0];
 		} else {
 			// default: just uses this filename with respect to $CLASSPATH
-			conf = "mdns.conf";
+			conf = "config/mdns.conf";
 		}
 
 		System.out.println("daemon: initialized.");
