@@ -287,7 +287,7 @@ public class ChordGroup extends DNSGroup {
 			throw new RuntimeException("CG " + fullName + " error: could not create", e);
 		}
 		
-		System.out.println("CG " + fullName + ": created chord, serving at " laddr + ":"+ lport);
+		System.out.println("CG " + fullName + ": created chord, serving at " + laddr + ":"+ lport);
 	}
 	
 	private void joinChord() {
