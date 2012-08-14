@@ -12,6 +12,8 @@ public class MultiDNS {
 	protected jnamed dns_server;
 	protected InterGroupServer igs;
 	protected boolean running;
+	private String hostname;
+	private String address;
 
 	// For User Preferences
 	private XStream xstream;
@@ -25,6 +27,8 @@ public class MultiDNS {
 	// This function only called ONCE! (initializer)
 	public MultiDNS() throws Exception {
         running = false;
+        hostname = null;
+        address = null;
 
         groupList = new ArrayList<DNSGroup>();
 		serviceList = new ArrayList<Service>();
@@ -77,6 +81,32 @@ public class MultiDNS {
 		for (DNSGroup group : groupList) {
 			group.stop();
 		}
+	}
+
+	public void setName(String name) {
+		// only allow this to be set ONCE!
+		if (hostname != null) {
+			return;
+		}
+
+		hostname = name;
+	}
+
+	protected String getName() {
+		return hostname;
+	}
+
+	public void setAddr(String addr) {
+		// only allow this to be set ONCE!
+		if (address != null) {
+			return;
+		}
+
+		address = addr;
+	}
+
+	protected String getAddr() {
+		return address;
 	}
 
 	private void loadServices() {		
@@ -243,7 +273,7 @@ public class MultiDNS {
 	}
 	
 	public void createService(String name) {
-		Service s = new Service(name, 0);
+		Service s = new Service(name, 0, this);
 		//TODO: CHECK FOR DUPLICATES!
 		
 		// alert all DNSGroup instances

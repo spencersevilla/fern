@@ -81,7 +81,7 @@ public class ChordGroup extends DNSGroup {
 			return false;
 		}
 
-		Service s = new Service(name, 1000);
+		Service s = new Service(name, 1000, mdns);
 		StringKey key = new StringKey(s.name);		
 		Set set;
 		
@@ -341,7 +341,7 @@ public class ChordGroup extends DNSGroup {
 			s = "join";
 		}
 		
-		Service serv = new Service("creator", 500);
+		Service serv = new Service("creator", 500, null);
 		
 		if (s.equals("register")) {
 			ChordGroup c = new ChordGroup(null, "testchord");

@@ -111,7 +111,14 @@ public class MainClass implements Daemon, DaemonUserSignal {
 	        	if (type.charAt(0) == '#')
 					continue;
 
-	        	if (type.equals("GROUP")) {
+				if (type.equals("NAME")) {
+					String hostname = st.nextToken();
+					mdns.setName(hostname);
+				} else if (type.equals("ADDR")) {
+					String addr = st.nextToken();
+					mdns.setAddr(addr);
+					
+				} else if (type.equals("GROUP")) {
 	        		String command = st.nextToken();
 	        		if (command.equals("TOP")) {
 	        			int gid = Integer.parseInt(st.nextToken());
