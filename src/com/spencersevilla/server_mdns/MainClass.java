@@ -8,10 +8,11 @@ import java.util.*;
 
 public class MainClass implements Daemon, DaemonUserSignal {
 	protected MultiDNS mdns;
+	protected SwingGui gui;
+
 	private String conf;
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("MAIN");
 
 		if (args.length > 1) {
 			System.out.println("usage: MainClass [conf_file]");
@@ -20,8 +21,9 @@ public class MainClass implements Daemon, DaemonUserSignal {
 
 		MainClass m = new MainClass();
 		m.mdns = new MultiDNS();
+		m.gui = new SwingGui(m.mdns);
 
-		if (m.mdns == null) {
+		if (m.mdns == null || m.gui == null) {
 			System.out.println("error: could not initialize mdns!");
 			System.exit(0);
 		}

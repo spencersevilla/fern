@@ -33,10 +33,6 @@
 
 	<target name="run" depends="jar">
 		<java fork="true" classname="${main-class}">
-			<arg value="${arg0}" />
-			<arg value="${arg1}" />
-			<arg value="${arg2}" />
-			<arg value="${arg3}" />
 			<classpath>
 				<path refid="classpath" />
 				<path path="${config.dir}" />
