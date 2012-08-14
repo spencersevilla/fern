@@ -44,6 +44,10 @@ public class FloodGroup extends DNSGroup implements Runnable {
 		thread.start();
 	}
 	
+	public void stop() {
+		System.out.println("FG " + fullName + " stopping.");
+	}
+
 	public String getResponse() {
 		String s = addr + ":" + port;
 		return s;

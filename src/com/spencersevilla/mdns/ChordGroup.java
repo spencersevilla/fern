@@ -71,6 +71,10 @@ public class ChordGroup extends DNSGroup {
 		}
 	}
 
+	public void stop() {
+		System.out.println("CG " + fullName + " stopping.");
+	}
+
 	public boolean createSubGroup(String name) {
 		if (chord == null) {
 			System.err.println("CG " + fullName + " createSubGroup error: chord == null");

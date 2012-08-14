@@ -2,18 +2,17 @@
 
 # Setup variables
 EXEC=jsvc
-JAVA_HOME=/usr/libexec/java_home
+JAVA_HOME=/usr/lib/jvm/java-6-sun
 CLASS_PATH="./lib/*:./config:./jar/MultiDNS.jar"
 CLASS=com.spencersevilla.server_mdns.MainClass
-USER=ssevilla
+USER=spencer
 PID=/tmp/example.pid
 LOGFILE=logs/mdns_log.txt
 LOG_ERR=/tmp/example.err
 
 do_exec()
 {
-    # $EXEC -home "$JAVA_HOME" -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $1 $CLASS
-    $EXEC -cp "$CLASS_PATH" -outfile $LOGFILE -errfile $LOGFILE -user $USER -pidfile $PID $1 $CLASS $2
+    $EXEC -home $JAVA_HOME -cp $CLASS_PATH -outfile $LOGFILE -errfile $LOGFILE -user $USER -pidfile $PID $1 $CLASS $2
 }
 
 case "$1" in
