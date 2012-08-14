@@ -29,7 +29,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		if (args.length > 0) {
 			m.conf = args[0];
 		} else {
-			m.conf = "mdns.conf";
+			m.conf = "config/mdns.conf";
 		}
 
 		m.start();
@@ -41,7 +41,6 @@ public class MainClass implements Daemon, DaemonUserSignal {
 	// Java Daemon interface here! ============================================
 
 	public void init(DaemonContext context) throws DaemonInitException, Exception {
-		System.out.println("daemon: init!");
 		mdns = new MultiDNS();
 
 		if (mdns == null) {
@@ -57,21 +56,22 @@ public class MainClass implements Daemon, DaemonUserSignal {
 			// default: just uses this filename with respect to $CLASSPATH
 			conf = "mdns.conf";
 		}
+
+		System.out.println("daemon: initialized.");
 	}
 
 	public void start() throws Exception {
-		System.out.println("daemon: start!");
 		mdns.start();
 		readConf(conf);
+		System.out.println("daemon: started.");
 	}
 
 	public void stop() throws Exception {
-		System.out.println("daemon: stop!");
 		mdns.stop();
+		System.out.println("daemon: stopped.");
 	}
 
 	public void destroy() {
-		System.out.println("daemon: destroy!");
 		mdns.exit();
 	}
 
@@ -92,7 +92,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 			br = new BufferedReader(isr);
 		}
 		catch (Exception e) {
-			System.out.println("daemon: could not open " + conffile);
+			System.err.println("daemon: could not open " + conffile);
 			return;
 		}
 

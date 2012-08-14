@@ -1,0 +1,10 @@
+TODOS:
+
+- redo android_mdns and laptop_mdns to take advantage of the init() vs start() methods!
+- change name: dssd? dynamic scalable service discovery?
+- git consistency!
+
+req. for paper:
+- DNS record emulation
+- adhoc-on-android emulation
+- caching (???)
