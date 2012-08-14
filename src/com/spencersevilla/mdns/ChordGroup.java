@@ -50,6 +50,7 @@ public class ChordGroup extends DNSGroup {
 	
 	// DNSGroup methods =========================================================
 	public void start() {
+		laddr = mdns.getAddr;
 		if (laddr == null) {
 			try {
 				laddr = InetAddress.getLocalHost().getHostName();
