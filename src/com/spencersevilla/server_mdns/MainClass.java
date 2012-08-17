@@ -5,6 +5,7 @@ import org.apache.commons.daemon.*;
 
 import java.io.*;
 import java.util.*;
+import java.net.InetAddress;
 
 public class MainClass implements Daemon, DaemonUserSignal {
 	protected MultiDNS mdns;
@@ -35,6 +36,15 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		}
 
 		m.start();
+
+		// TESTING HERE!!!
+		// try {
+		// 	InetAddress dns_server = InetAddress.getByName("13.1.136.66");
+		// 	InetAddress addr = m.mdns.forwardRequest("www.google.com.", 0, dns_server, 53);
+		// 	System.out.println("request returned: " + addr);
+		// } catch (Exception e) {
+		// 	e.printStackTrace();
+		// }
 	}
 
 	public MainClass() throws Exception {
@@ -116,10 +126,21 @@ public class MainClass implements Daemon, DaemonUserSignal {
 				if (type.equals("NAME")) {
 					String hostname = st.nextToken();
 					mdns.setName(hostname);
+
 				} else if (type.equals("ADDR")) {
 					String addr = st.nextToken();
 					mdns.setAddr(addr);
 					
+				} else if (type.equals("SERVICE")) {
+	        		String servicename = st.nextToken();
+	        		mdns.createService(servicename);
+
+
+				} else if (type.equals("DNS")) {
+					String name = st.nextToken();
+					String addr = st.nextToken();
+					mdns.addDNSServer(name, addr);
+
 				} else if (type.equals("GROUP")) {
 	        		String command = st.nextToken();
 	        		if (command.equals("TOP")) {
@@ -159,10 +180,8 @@ public class MainClass implements Daemon, DaemonUserSignal {
 	        			}
 	        			mdns.joinGroup(group);
 	        		}
-	        	} else if (type.equals("SERVICE")) {
-	        		String servicename = st.nextToken();
-	        		mdns.createService(servicename);
 	        	}
+
 	        }
 		} catch (IOException e) {
 			// do nothing special here, we've already broken out of the loop

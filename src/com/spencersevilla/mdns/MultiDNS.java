@@ -9,7 +9,6 @@ import com.thoughtworks.xstream.XStream;
 public class MultiDNS {
     
     protected BootstrapServer bs;
-	protected jnamed dns_server;
 	protected InterGroupServer igs;
 	protected boolean running;
 	private String hostname;
@@ -43,13 +42,9 @@ public class MultiDNS {
 		// loadServices();
 		// loadGroups();
 
-		// here we initialize (but don't start) all the servers.
-		// We absolutely MUST initialize the jnamed here! this is
-		// because it requires a privileged port (UDP53) and we
-		// don't want to run MultiDNS start() with root privileges!
+		// here we initialize (but don't start) all of the servers.
         bs = new BootstrapServer(this);
 		igs = new InterGroupServer(this);
-		dns_server = new jnamed(this);
 
 		System.out.println("MDNS: initialized!");
 	}
@@ -58,14 +53,12 @@ public class MultiDNS {
 	public void start() throws Exception {
 		bs.start();
 		igs.start();
-		dns_server.start();
 		System.out.println("MDNS: started!");
 	}
 	
 	public void stop() throws Exception {
 		bs.stop();
 		igs.stop();
-		dns_server.stop();
 		System.out.println("MDNS: stopped!");
 
 		// also pause every service we're a part of
@@ -107,6 +100,15 @@ public class MultiDNS {
 
 	protected String getAddr() {
 		return address;
+	}
+
+	public void addDNSServer(String name, String address) {
+		try {
+			InetAddress addr = InetAddress.getByName(address);
+			igs.addDNSServer(name, addr);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void loadServices() {		
@@ -306,16 +308,8 @@ public class MultiDNS {
 		if (servicename.endsWith(".")) {
 			servicename = servicename.substring(0, servicename.length() - 1);
 		}
-
-		// make sure we trapped appropriately from jnamed
-		if (!servicename.endsWith(".spencer")) {
-			System.err.println("MDNS error: received incorrect servicename " + servicename);
-			return null;
-		}
-		// ok now remove the dns format-key from it
-		String trimName = servicename.substring(0, servicename.length() - 8);		
 		
-		DNSGroup group = findResponsibleGroup(trimName);
+		DNSGroup group = findResponsibleGroup(servicename);
 		if (group == null) {
 			// nowhere to foward, we don't know anyone in this hierarchy!
 			// note: MAYBE flooding a request could find cached information
@@ -323,18 +317,11 @@ public class MultiDNS {
 			return null;
 		}
 		
-		String addr = group.resolveService(trimName);
-			if (addr != null) {
-				try {
-					return InetAddress.getByName(addr);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		return null;
+		InetAddress addr = group.resolveService(servicename);
+		return addr;
 	}
 	
-	public String forwardRequest(String servicename, int minScore) {
+	public InetAddress forwardRequest(String servicename, int minScore) {
 		// forward or rebroadcast the request to a different group if possible
 		// minScore ensures that we don't loop: we can only forward to another group
 		// if it's a better match than the group this request came from.
@@ -349,7 +336,7 @@ public class MultiDNS {
 		return g.resolveService(servicename, minScore);
 	}
 	
-	public String forwardRequest(String servicename, int minScore, String addr, int port) {
+	public InetAddress forwardRequest(String servicename, int minScore, InetAddress addr, int port) {
 		return igs.resolveService(servicename, minScore, addr, port);
 	}
 	
