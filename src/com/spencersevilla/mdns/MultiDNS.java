@@ -314,6 +314,7 @@ public class MultiDNS {
 			// nowhere to foward, we don't know anyone in this hierarchy!
 			// note: MAYBE flooding a request could find cached information
 			// BUT that's unlikely and could even be a DDOS attack vector
+			System.err.println("MDNS error: could not find a responsible group for " + servicename);
 			return null;
 		}
 		
@@ -337,6 +338,7 @@ public class MultiDNS {
 	}
 	
 	public InetAddress forwardRequest(String servicename, int minScore, InetAddress addr, int port) {
+		System.out.println("MDNS: forwarding request " + servicename + " to " + addr + ":" + port);
 		return igs.resolveService(servicename, minScore, addr, port);
 	}
 	

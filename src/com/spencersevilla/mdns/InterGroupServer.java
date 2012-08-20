@@ -314,7 +314,7 @@ class InterGroupThread extends Thread {
 		if (nameString.endsWith(".dssd")) {
 			nameString = nameString.substring(0, nameString.length() - 5);
 		} else {
-			// what happened? we already checked for this!
+			// what the hell happened? we already checked for this!
 			return Rcode.REFUSED;
 		}
 

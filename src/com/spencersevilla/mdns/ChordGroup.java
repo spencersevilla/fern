@@ -159,6 +159,8 @@ public class ChordGroup extends DNSGroup {
 			return null;
 		}
 		
+		System.out.println("CG " + fullName + ": resolving " + name);
+
 		// STEP 1: PRODUCE A SERVICENAME!
 		String servicename = getServiceName(name);
 		
@@ -174,10 +176,12 @@ public class ChordGroup extends DNSGroup {
 		}
 		
 		if (set == null) {
+			System.err.println("CG " + fullName + " error: set was null!");
 			return null;
 		}
 		
 		if (set.isEmpty()) {
+			System.err.println("CG " + fullName + " error: set was empty!");
 			return null;
 		}
 		
@@ -191,6 +195,7 @@ public class ChordGroup extends DNSGroup {
 		if (servicename.equals(servicegroups[0])) {
 			try {
 				InetAddress result = InetAddress.getByName(res);
+				System.out.println("CG " + fullName + ": returning " + result + "for " + name);
 				return result;
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
@@ -198,9 +203,10 @@ public class ChordGroup extends DNSGroup {
 			}
 		} else {
 			// indicates we're not prepared to forward?
-			if (minScore == 0) {
-				return null;
-			}
+			// if (minScore == 0) {
+			// 	System.err.println("CG " + fullName + " error: minscore return???");
+			// 	return null;
+			// }
 						
 			// String vals = res.split(":");
 			// if (vals.length < 2) {
@@ -210,7 +216,7 @@ public class ChordGroup extends DNSGroup {
 			// maybe don't hard-code these in?
 			try {
 			InetAddress addr = InetAddress.getByName(res);
-			int port = 5300;
+			int port = 53;
 			return mdns.forwardRequest(name, minScore, addr, port);
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
