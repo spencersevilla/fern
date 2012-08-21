@@ -20,6 +20,7 @@ public class MultiDNS {
 	private static final String group_file = "config/groups.xml";
     
 	public ArrayList<DNSGroup> groupList;
+	public ArrayList<CacheEntry> cacheList;
 	public ArrayList<Service> serviceList;
 	public ArrayList<DNSGroup> allGroups;
 
@@ -30,6 +31,7 @@ public class MultiDNS {
         address = null;
 
         groupList = new ArrayList<DNSGroup>();
+        cacheList = new ArrayList<CacheEntry>();
 		serviceList = new ArrayList<Service>();
 		allGroups = new ArrayList<DNSGroup>();
 
@@ -303,13 +305,23 @@ public class MultiDNS {
 	public InetAddress resolveService(String servicename) {
 		// FIRST: determine scope of address and who to forward it to
 		// IF there is no acceptable/reachable group, complain!
+		InetAddress addr = null;
 
 		// look out for trailing dot just-in-case (trim if exists)
 		if (servicename.endsWith(".")) {
 			servicename = servicename.substring(0, servicename.length() - 1);
 		}
 		
+		// "group" is the best-match-DNS-group available to us!
 		DNSGroup group = findResponsibleGroup(servicename);
+
+		// before we ask the group, let's see if we can do better with the cache?
+		addr = askCache(servicename, group);
+
+		if (addr != null) {
+			return addr;
+		}
+
 		if (group == null) {
 			// nowhere to foward, we don't know anyone in this hierarchy!
 			// note: MAYBE flooding a request could find cached information
@@ -318,7 +330,7 @@ public class MultiDNS {
 			return null;
 		}
 		
-		InetAddress addr = group.resolveService(servicename);
+		addr = group.resolveService(servicename);
 		return addr;
 	}
 	
@@ -342,6 +354,45 @@ public class MultiDNS {
 		return igs.resolveService(servicename, minScore, addr, port);
 	}
 	
+	private InetAddress askCache(String servicename, DNSGroup group) {
+		// Step 1: Find closest-match entry. Note that this function is
+		// executed BEFORE we ask the group to resolve, so we should only
+		// return an answer here if we can do better than just the group itself.
+		int groupScore = group.calculateScore(servicename);
+
+		CacheEntry bestChoice = null;
+		int highScore = groupScore;
+		int score;
+
+		for (CacheEntry entry : cacheList) {
+			score = entry.calculateScore(servicename);
+			if (score > highScore) {
+				bestChoice = entry;
+				highScore = score;
+			}
+		}
+
+		// Step 2: if EXACT match, return address. If not, if it's a
+		// DNS server then go ahead and forward the message! If it's
+		// not an exact match nor a server, go ahead and bail out(???)
+		if (bestChoice == null) {
+			return null;
+		}
+
+		// this is the exact-match, so return it!
+		if (bestChoice.isExactMatch(servicename)) {
+			return bestChoice.addr;
+		}
+
+		// this is a better DNS server to request from, so forward it on!
+		if (bestChoice.server == true) {
+			return forwardRequest(servicename, 0, bestChoice.addr, bestChoice.port);
+		}
+
+		// not the best match nor a DNS server, so we can't do anything with it.
+		return null;
+	}
+
 	protected DNSGroup findResponsibleGroup(String servicename) {
 		return findResponsibleGroup(servicename, 0);
 	}
@@ -361,10 +412,7 @@ public class MultiDNS {
 				highScore = score;
 			}
 		}
-		
-		// if (bestChoice != null)
-		// 	System.out.println("findResponsibleGroup chose: " + bestChoice + "for string: " + servicename + "with score: " + highScore);
-		
+				
 		return bestChoice;
 	}
 		
