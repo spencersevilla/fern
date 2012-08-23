@@ -103,10 +103,16 @@ public class ServerGroup extends DNSGroup implements Runnable {
 	}
 
 	public void stop() {
+		System.out.println("SG " + fullName + ": stopped.");
 		if (!serving) {
-			System.out.println("SG " + fullName + ": stopped.");
+			for (Service s : mdns.serviceList) {
+				serviceRemoved(s);
+			}
 			return;
 		}
+
+		// don't really know anything else we have to do here for cleanup...?
+		return;
 	}
 	public void serviceRegistered(Service s) {
 		if (serving) {
@@ -176,6 +182,7 @@ public class ServerGroup extends DNSGroup implements Runnable {
 
 		// Service not found
 		if (a == null) {
+			System.out.println("SG " + fullName + ": no result for request " + name);
 			return null;
 		}
 
@@ -183,8 +190,10 @@ public class ServerGroup extends DNSGroup implements Runnable {
 		// Or if it's a redirect for another server!
 		String[] servicegroups = name.split("\\.");
 		if (servicename.equals(servicegroups[0])) {
+			System.out.println("SG " + fullName + ": returning " + a + " for request " + name);
 			return a;
 		} else {
+			System.out.println("SG " + fullName + ": forwarding request for " + name + " to " + a);
 			int p = 53;
 			return mdns.forwardRequest(name, minScore, a, p);
 		}

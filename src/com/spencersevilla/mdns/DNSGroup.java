@@ -48,18 +48,30 @@ public abstract class DNSGroup {
 
 		ArrayList<String> arglist = new ArrayList<String>(Arrays.asList(args));
 		int type = Integer.parseInt(arglist.remove(0));
+		
+		return createGroupFromArgs(m, type, arglist);
+	}
+	
+	// This is the ONE entry-point for parsing a group ID and creating 
+	// the appropriate DNSGroup. In theory, this is the ONLY spot 
+	// that should have to be changed to support an additional group type.
+	public static final DNSGroup createGroupFromArgs(MultiDNS m, int gid, ArrayList<String> args) {
+		DNSGroup group = null;
 
-		if (type == FloodGroup.id) {
-			group = new FloodGroup(m, arglist);
-		} else if (type == ChordGroup.id) {
-			group = new ChordGroup(m, arglist);
+		if (gid == FloodGroup.id) {
+			group = new FloodGroup(m, args);
+		} else if (gid == ChordGroup.id) {
+			group = new ChordGroup(m, args);
+		} else if (gid == ServerGroup.id) {
+			group = new ServerGroup(m, args);
 		} else {
 			group = null;
 		}
 		
 		return group;
 	}
-	
+
+
 	// this returns a boolean that shows if this group is as good 
 	// of a match as could possibly be made! "true" here means we will never
 	// forward - either we find the service at this group or it doesn't exist

@@ -219,19 +219,8 @@ public class MultiDNS {
 	}
 
 	public DNSGroup createGroup(int gid, ArrayList<String> args) {
-		DNSGroup group = null;
-		if (gid == 0) {
-			// FloodGroup
-			group = new FloodGroup(this, args);
-		} else if (gid == 1) {
-			// ChordGroup
-			group = new ChordGroup(this, args);
-		} else if (gid == 2) {
-			// ServerGroup
-			group = new ServerGroup(this, args);
-		}
+		DNSGroup group = DNSGroup.createGroupFromArgs(this, gid, args);
 
-		System.out.println("group: " + group);
 		if (group == null) {
 			return null;
 		}
