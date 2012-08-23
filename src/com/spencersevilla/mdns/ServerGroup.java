@@ -51,7 +51,7 @@ public class ServerGroup extends DNSGroup implements Runnable {
 		}
 	}
 
-	// DNSGroup methods =========================================================
+	// DNSGroup required methods =========================================================
 	public void start() {
 		if (!serving) {
 			System.out.println("SG " + fullName + ": starting-up, but not serving!");
@@ -197,5 +197,31 @@ public class ServerGroup extends DNSGroup implements Runnable {
 			int p = 53;
 			return mdns.forwardRequest(name, minScore, a, p);
 		}
+	}
+
+	// DNSGroup optional methods ========================================================
+
+	// for BootstrapServer
+	protected String getResponse() {
+		String ret = new String("join:" + addr + ":" + port);
+		return ret;
+	}
+
+	public boolean createSubGroup(String name) {
+		String req_name = new String(name + "." + fullName);
+		InetAddress result = resolveService(req_name, 0);
+
+		// name is already taken!
+		if (result != null)
+			return false;
+
+		Service s = new Service(name, 0, mdns);
+		serviceRegistered(s);
+		return true;
+	}
+	
+	// cleanup method
+	public void exit() {
+		System.out.println("SG " + fullName + ": exiting group");
 	}
 }
