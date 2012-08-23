@@ -225,53 +225,6 @@ public class ChordGroup extends DNSGroup {
 		}
 	}
 	
-	private String getServiceName(String fullname) {
-		// GOAL: compare the fullname "spencer.csl.parc"
-		// with the chord name "parc.global" to produce the string
-		// "csl" which will be the key that the chord will search for!
-		String[] servicegroups = fullname.split("\\.");
-		Collections.reverse(Arrays.asList(servicegroups));
-		
-		// NOW: we're comparing the array servicegroups [parc, csl, spencer] with
-		// the chordgroup fullname array groups [global, parc] to figure out which
-		// entry in servicegroups we're looking for!
-		int startIndex = 0;
-		
-		for(startIndex = 0; startIndex < groups.length; startIndex++) {
-			if (servicegroups[0].equals(groups[startIndex])) {
-				break;
-			}
-		}
-		
-		if (startIndex == groups.length) {
-			System.err.println("CG " + fullName + ": getServiceName didn't find the name?");
-			return null;
-		}
-		
-		// HERE: startIndex has the first "hit" in the chordgroup fullname array
-		// The only way this function can operate is by going THROUGH the entire
-		// chordgroup's full name and finding it's first child. If this doesn't work,
-		// then there's an error! ie a ChordGroup of "parc.usa.global" can only answer
-		// queries for one level down, ie "XXX.parc.usa.global".
-		int retIndex = groups.length - startIndex;
-		if (retIndex < 0 || servicegroups.length <= retIndex) {
-			System.err.println("CG " + fullName + ": getServiceName bounds error");
-			return null;
-		}
-		
-		// double-check but every entry here should be equal!
-		for (int i = 0; i < retIndex; i++) {
-			if (!servicegroups[i].equals(groups[startIndex + i])) {
-				System.err.println("CG " + fullName + ": getServiceName could not make sense of groups");
-				return null;
-			}
-		}
-		
-		return servicegroups[retIndex];
-		// Chord CANNOT answer anything at all for "*.att.usa.global", "*.usa.global", etc.
-		// Find a way to forward up? Maybe a key for "parent"?
-	}
-	
 	// cleanup method
 	public void exit() {
 		if (running) {

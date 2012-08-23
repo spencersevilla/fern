@@ -226,8 +226,12 @@ public class MultiDNS {
 		} else if (gid == 1) {
 			// ChordGroup
 			group = new ChordGroup(this, args);
+		} else if (gid == 2) {
+			// ServerGroup
+			group = new ServerGroup(this, args);
 		}
 
+		System.out.println("group: " + group);
 		if (group == null) {
 			return null;
 		}
@@ -358,7 +362,11 @@ public class MultiDNS {
 		// Step 1: Find closest-match entry. Note that this function is
 		// executed BEFORE we ask the group to resolve, so we should only
 		// return an answer here if we can do better than just the group itself.
-		int groupScore = group.calculateScore(servicename);
+		int groupScore = 0;
+
+		if (group != null) {
+			groupScore = group.calculateScore(servicename);
+		}
 
 		CacheEntry bestChoice = null;
 		int highScore = groupScore;
