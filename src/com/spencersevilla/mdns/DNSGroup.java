@@ -11,6 +11,9 @@ public abstract class DNSGroup {
 	public boolean recursive;
 	public static int id;
 	
+// These functions are SPECIFIC to DNSGroup and may NOT be overridden by another class
+// ======================================================================================
+
 	public DNSGroup(MultiDNS m, String n) {
 		mdns = m;
 		recursive = false;
@@ -25,7 +28,7 @@ public abstract class DNSGroup {
 	
 	// This function identifies every DNSGroup uniquely using its fullname!
 	// We might want to cover some other strcmps for formatting/subgroups/etc
-	@Override public boolean equals(Object otherObject) {
+	@Override public final boolean equals(Object otherObject) {
 		// check for self-comparison
 		if ( this == otherObject ) return true;
 		// check for null and ensure class membership
@@ -37,6 +40,7 @@ public abstract class DNSGroup {
 		return this.fullName == null ? that.fullName == null : this.fullName.equals(that.fullName);
 	}
 	
+	// useful hook/massager into createGroupFromArgs
 	public static final DNSGroup createGroupFromString(MultiDNS m, String arg_string) {
 		String[] args = arg_string.split(":");
 		DNSGroup group = null;
@@ -71,29 +75,7 @@ public abstract class DNSGroup {
 		return group;
 	}
 
-
-	// this returns a boolean that shows if this group is as good 
-	// of a match as could possibly be made! "true" here means we will never
-	// forward - either we find the service at this group or it doesn't exist
-	// note that we subtract one from score for the servicename itself
-	protected boolean isBestPossibleMatch(String name) {
-		String[] names = name.split("\\.");
-		int maxLength = names.length;
-		int retVal = calculateScore(name);
-		return (retVal == maxLength);
-	}
-	
-	// for interface display
-	public String toString() {
-		return fullName;
-	}
-	
-	// for BootstrapServer
-	protected String getResponse() {
-		return null;
-	}
-	
-	protected int calculateScore(String servicename) {
+	protected final int calculateScore(String servicename) {
 		String[] names = servicename.split("\\.");
 		Collections.reverse(Arrays.asList(names));
 		int count = 0;
@@ -141,29 +123,18 @@ public abstract class DNSGroup {
 		return count;
 	}
 	
-	// the core methods for all groups
-	public abstract void start();
-	public abstract void stop();
-	public abstract void serviceRegistered(Service s);
-	public abstract void serviceRemoved(Service s);
-	public abstract InetAddress resolveService(String name);
-	public abstract InetAddress resolveService(String name, int minScore);
-	
-	public boolean joinGroup() {
-		// no work really necessary here?
-		start();
-		return true;
-	}	
-	public boolean createSubGroup(String name) {
-		return false;
+	// this returns a boolean that shows if this group is as good 
+	// of a match as could possibly be made! "true" here means we will never
+	// forward - either we find the service at this group or it doesn't exist
+	// note that we subtract one from score for the servicename itself
+	protected final boolean isBestPossibleMatch(String name) {
+		String[] names = name.split("\\.");
+		int maxLength = names.length;
+		int retVal = calculateScore(name);
+		return (retVal == maxLength);
 	}
 	
-	// cleanup method
-	public void exit() {
-		System.out.println("exiting group: " + name);
-	}
-
-	protected String getServiceName(String fullname) {
+	protected final String getServiceName(String fullname) {
 		// GOAL: compare the fullname "spencer.csl.parc"
 		// with the chord name "parc.global" to produce the string
 		// "csl" which will be the key that the chord will search for!
@@ -209,4 +180,42 @@ public abstract class DNSGroup {
 		// Chord CANNOT answer anything at all for "*.att.usa.global", "*.usa.global", etc.
 		// Find a way to forward up? Maybe a key for "parent"?
 	}
+	
+	// for interface display
+	public final String toString() {
+		return fullName;
+	}
+	
+
+// These functions MAY be overridden but are provided for ease-of-use in development
+// ======================================================================================
+
+	// for BootstrapServer
+	protected String getResponse() {
+		return null;
+	}
+	
+	public boolean joinGroup() {
+		// no work really necessary here?
+		start();
+		return true;
+	}	
+	public boolean createSubGroup(String name) {
+		return false;
+	}
+	
+	// cleanup method
+	public void exit() {
+		System.out.println("exiting group: " + name);
+	}
+
+// These functions MUST be overridden: they provide the core DNSGroup functionality!
+// ======================================================================================
+
+	public abstract void start();
+	public abstract void stop();
+	public abstract void serviceRegistered(Service s);
+	public abstract void serviceRemoved(Service s);
+	public abstract InetAddress resolveService(String name);
+	public abstract InetAddress resolveService(String name, int minScore);
 }
