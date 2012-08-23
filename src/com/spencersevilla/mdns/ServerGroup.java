@@ -155,7 +155,7 @@ public class ServerGroup extends DNSGroup implements Runnable {
 
 	public InetAddress resolveService(String name, int minScore) {
 		if (!serving) {
-			return mdns.forwardRequest(name, minScore, addr, port);
+			return mdns.forwardRequest(name, minScore, addr, 53);
 		}
 
 		System.out.println("SG " + fullName + ": resolving " + name);
