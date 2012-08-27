@@ -21,13 +21,16 @@ public class ChordGroup extends DNSGroup {
 	public int lport = 0;
 	public String daddr = null;
 	public int dport = 0;
+	private ArrayList<Service> services;
 
 	ChordGroup(MultiDNS m, String n) {
 		super(m, n);
+		services = new ArrayList<Service>();
 	}
 	
 	ChordGroup(MultiDNS m, ArrayList<String> nameArgs) {
 		super(m, nameArgs.get(0));
+		services = new ArrayList<Service>();
 
 		if (nameArgs.get(1).equals("create")) {
 			if (nameArgs.size() > 2) {
@@ -73,7 +76,11 @@ public class ChordGroup extends DNSGroup {
 	}
 
 	public void stop() {
-		System.out.println("CG " + fullName + " stopping.");
+		for (Service s : services) {
+			serviceRemoved(s);
+		}
+
+		System.out.println("CG " + fullName + ": stopped.");
 	}
 
 	public boolean createSubGroup(String name) {
@@ -106,6 +113,7 @@ public class ChordGroup extends DNSGroup {
 		try {
 			chord.insert(key, s.addr);
 			System.out.println("CG " + fullName + ": inserted " + s.addr + " for key: " + s.name);
+			services.add(s);
 			return true;
 		} catch (Exception e) {
 			System.err.println("CG " + fullName + " error: could not insert " + s.addr + " for key: " + s.name);
@@ -126,6 +134,7 @@ public class ChordGroup extends DNSGroup {
 		try {
 			chord.insert(key, s.addr);
 			System.out.println("CG " + fullName + ": inserted " + s.addr + " for key: " + s.name);
+			services.add(s);
 		} catch (Exception e) {
 			System.err.println("CG " + fullName + " error: could not insert " + s.addr + " for key: " + s.name);
 			e.printStackTrace();
@@ -139,6 +148,7 @@ public class ChordGroup extends DNSGroup {
 		}
 		
 		StringKey key = new StringKey(s.name);
+		services.remove(s);
 		
 		try {
 			chord.remove(key, s.addr);

@@ -15,11 +15,12 @@ public class FloodGroup extends DNSGroup implements Runnable {
 	public int port = 6363;
     public String addr = "224.4.5.6";
     private MulticastSocket socket;
+    private ArrayList<InetAddress> self_addrs;
 
 	// Constructor and Bookkeeping Methods
 	FloodGroup(MultiDNS m, String n) {
 		super(m, n);
-
+		self_addrs = new ArrayList<InetAddress>();
 		serviceHash = new HashMap();
 	}
 	
@@ -28,7 +29,8 @@ public class FloodGroup extends DNSGroup implements Runnable {
 
 		super(m, nameArgs.get(0));
 		serviceHash = new HashMap();
-		
+		self_addrs = new ArrayList<InetAddress>();
+
 		if (nameArgs.size() > 1) {
 			addr = nameArgs.get(1);
 		}
@@ -72,10 +74,23 @@ public class FloodGroup extends DNSGroup implements Runnable {
         DatagramPacket pack;
         boolean listening = true;
 
+        // code to record ALL self-ip addresses so we can ignore them!
+		try {
+			System.out.println("Full list of Network Interfaces:");
+			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+				NetworkInterface intf = en.nextElement();
+				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+					self_addrs.add(enumIpAddr.nextElement());
+				}
+			}
+		} catch (SocketException e) {
+			System.out.println(" (error retrieving network interface list)");
+		}
+
         try {
 			socket = new MulticastSocket(port);
 	        socket.joinGroup(InetAddress.getByName(addr));
-			
+
 	        System.out.println("FG " + fullName + ": serving on " + addr + ":" + port);
 	        
 			while(listening) {
@@ -83,6 +98,13 @@ public class FloodGroup extends DNSGroup implements Runnable {
 				pack = new DatagramPacket(buf, buf.length);
 				
 		        socket.receive(pack);
+
+		        // FIRST: check to make sure that we aren't asking ourself!
+		        if (self_addrs.contains(pack.getAddress())) {
+		        	continue;
+		        } else {
+		        	System.out.println("address from: " + pack.getAddress());
+		        }
 				
 				String data = new String(pack.getData());
 				String[] args = data.split(":");
@@ -162,6 +184,7 @@ public class FloodGroup extends DNSGroup implements Runnable {
 	}
 	
 	public InetAddress resolveService(String name, int minScore) {
+		System.out.println("FG " + fullName + ": resolving " + name);
 		String bstring = new String("FLD_REQ:" + fullName + ":" + name);
 		byte buf[] = bstring.getBytes();
 		byte buf2[] = new byte[1024];
@@ -172,7 +195,7 @@ public class FloodGroup extends DNSGroup implements Runnable {
 			DatagramPacket pack = new DatagramPacket(buf, buf.length, InetAddress.getByName(addr), port);
 
 			MulticastSocket s = new MulticastSocket();
-			
+
 			// wait 10 seconds
 			s.setSoTimeout(10000);
 
