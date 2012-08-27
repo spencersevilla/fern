@@ -47,8 +47,8 @@ public class InterGroupServer implements Runnable {
 		System.out.println("IGS: stopped");
 
 		// abort all running requests
-		for (InterGroupThread t : threads) {
-			t.exit();
+		for (Iterator<InterGroupThread> it = threads.iterator(); it.hasNext(); ) {
+			it.remove();
 		}
 	}
 

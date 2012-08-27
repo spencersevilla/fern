@@ -114,7 +114,7 @@ public class ChordGroup extends DNSGroup {
 		
 		// now try inserting
 		try {
-			chord.insert(key, s.addr);
+			chord.insert(key, s.addr.getHostAddress());
 			System.out.println("CG " + fullName + ": inserted " + s.addr + " for key: " + s.name);
 			services.add(s);
 			return true;
@@ -135,7 +135,7 @@ public class ChordGroup extends DNSGroup {
 		StringKey key = new StringKey(s.name);
 		
 		try {
-			chord.insert(key, s.addr);
+			chord.insert(key, s.addr.getHostAddress());
 			System.out.println("CG " + fullName + ": inserted " + s.addr + " for key: " + s.name);
 			services.add(s);
 		} catch (Exception e) {
