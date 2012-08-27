@@ -133,7 +133,7 @@ public class ServerGroup extends DNSGroup implements Runnable {
 			System.out.println("SG " + fullName + " client: registering service " + s);
 			DatagramSocket sock = new DatagramSocket();
 
-			String send = new String("SRV_REG:" + s.name + ":" + s.addr);
+			String send = new String("SRV_REG:" + s.name + ":" + s.addr.getHostAddress());
 			byte[] data = send.getBytes();
 			DatagramPacket pack = new DatagramPacket(data, data.length, addr, port);
 			sock.send(pack);
