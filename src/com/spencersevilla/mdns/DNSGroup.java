@@ -10,6 +10,7 @@ public abstract class DNSGroup {
 	protected MultiDNS mdns;
 	public boolean recursive;
 	public static int id;
+	public DNSGroup parent;
 	
 // These functions are SPECIFIC to DNSGroup and may NOT be overridden by another class
 // ======================================================================================
@@ -17,7 +18,7 @@ public abstract class DNSGroup {
 	public DNSGroup(MultiDNS m, String n) {
 		mdns = m;
 		recursive = false;
-		
+		parent = null;
 		fullName = n;
 		groups = n.split("\\.");
 		name = groups[0];

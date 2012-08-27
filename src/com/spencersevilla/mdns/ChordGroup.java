@@ -217,7 +217,7 @@ public class ChordGroup extends DNSGroup {
 			try {
 			InetAddress addr = InetAddress.getByName(res);
 			int port = 53;
-			return mdns.forwardRequest(name, minScore, addr, port);
+			return mdns.forwardRequest(name, this, addr, port);
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 				return null;

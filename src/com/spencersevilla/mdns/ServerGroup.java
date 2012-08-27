@@ -167,7 +167,7 @@ public class ServerGroup extends DNSGroup implements Runnable {
 		System.out.println("SG " + fullName + ": resolving " + name);
 
 		if (!serving) {
-			return mdns.forwardRequest(name, minScore, addr, 53);
+			return mdns.forwardRequest(name, this, addr, 53);
 		}
 
 		String servicename = getServiceName(name);
@@ -200,7 +200,7 @@ public class ServerGroup extends DNSGroup implements Runnable {
 		} else {
 			System.out.println("SG " + fullName + ": forwarding request for " + name + " to " + a);
 			int p = 53;
-			return mdns.forwardRequest(name, minScore, a, p);
+			return mdns.forwardRequest(name, this, a, p);
 		}
 	}
 

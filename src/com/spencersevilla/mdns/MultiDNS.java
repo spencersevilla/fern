@@ -241,7 +241,13 @@ public class MultiDNS {
 		args.set(0,fname);
 
 		// here we create the according DNSGroup
-		return createGroup(gid, args);
+		DNSGroup g = createGroup(gid, args);
+
+		if (g != null) {
+			g.parent = parent;
+		}
+
+		return g;
 	}
 
 	public void leaveGroup(DNSGroup g) {
@@ -327,24 +333,24 @@ public class MultiDNS {
 		return addr;
 	}
 	
-	public InetAddress forwardRequest(String servicename, int minScore) {
+	public InetAddress forwardRequest(String servicename, DNSGroup group) {
 		// forward or rebroadcast the request to a different group if possible
 		// minScore ensures that we don't loop: we can only forward to another group
 		// if it's a better match than the group this request came from.
 		
-		DNSGroup g = findResponsibleGroup(servicename, minScore);
+		DNSGroup g = findResponsibleGroup(servicename, group);
 		if (g == null) {
 			System.err.println("MDNS: cannot forward request " + servicename + ", so ignoring it.");
 			return null;
 		}
 		
 		System.out.println("MDNS: forwarding request " + servicename + " internally to group " + g);
-		return g.resolveService(servicename, minScore);
+		return g.resolveService(servicename);
 	}
 	
-	public InetAddress forwardRequest(String servicename, int minScore, InetAddress addr, int port) {
+	public InetAddress forwardRequest(String servicename, DNSGroup group, InetAddress addr, int port) {
 		System.out.println("MDNS: forwarding request " + servicename + " to " + addr + ":" + port);
-		return igs.resolveService(servicename, minScore, addr, port);
+		return igs.resolveService(servicename, 0, addr, port);
 	}
 	
 	private InetAddress askCache(String servicename, DNSGroup group) {
@@ -383,7 +389,7 @@ public class MultiDNS {
 
 		// this is a better DNS server to request from, so forward it on!
 		if (bestChoice.server == true) {
-			return forwardRequest(servicename, 0, bestChoice.addr, bestChoice.port);
+			return forwardRequest(servicename, null, bestChoice.addr, bestChoice.port);
 		}
 
 		// not the best match nor a DNS server, so we can't do anything with it.
@@ -391,20 +397,26 @@ public class MultiDNS {
 	}
 
 	protected DNSGroup findResponsibleGroup(String servicename) {
-		return findResponsibleGroup(servicename, 0);
+		return findResponsibleGroup(servicename, null);
 	}
 	
-	protected DNSGroup findResponsibleGroup(String servicename, int minScore) {
+	protected DNSGroup findResponsibleGroup(String servicename, DNSGroup initial) {
 
 		// cycle through all group memberships
 		// give each group a "score" based on longest-prefix
 		// then choose the best choice! (null if none accceptable)
 		DNSGroup bestChoice = null;
-		int highScore = minScore;
+		int highScore = 0;
+
+		if (initial != null) {
+			bestChoice = initial;
+			highScore = initial.calculateScore(servicename);
+		}
+
 		int score;
 		for (DNSGroup group : groupList) {
 			score = group.calculateScore(servicename);
-			if (score > highScore) {
+			if (score > highScore || (bestChoice != null && score == highScore && group == bestChoice.parent)) {
 				bestChoice = group;
 				highScore = score;
 			}
