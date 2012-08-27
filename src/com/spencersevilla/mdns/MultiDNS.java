@@ -12,7 +12,7 @@ public class MultiDNS {
 	protected InterGroupServer igs;
 	protected boolean running;
 	private String hostname;
-	private String address;
+	private InetAddress address;
 
 	// For User Preferences
 	private XStream xstream;
@@ -97,10 +97,16 @@ public class MultiDNS {
 			return;
 		}
 
-		address = addr;
+		try {
+			InetAddress a = InetAddress.getByName(addr);
+			address = a;
+		} catch (UnknownHostException e) {
+			System.err.println("MDNS error: given an invalid address!");
+			e.printStackTrace();
+		}
 	}
 
-	protected String getAddr() {
+	protected InetAddress getAddr() {
 		return address;
 	}
 
@@ -310,17 +316,23 @@ public class MultiDNS {
 		if (servicename.endsWith(".")) {
 			servicename = servicename.substring(0, servicename.length() - 1);
 		}
-		
+
 		// "group" is the best-match-DNS-group available to us!
 		DNSGroup group = findResponsibleGroup(servicename);
 
-		// before we ask the group, let's see if we can do better with the cache?
-		addr = askCache(servicename, group);
-
+		// FIRST: is this me?
+		addr = checkSelf(servicename, group);
 		if (addr != null) {
 			return addr;
 		}
 
+		// NEXT: do we have any cached group information?
+		addr = askCache(servicename, group);
+		if (addr != null) {
+			return addr;
+		}
+
+		// LAST: go ahead and query the group, if it exists
 		if (group == null) {
 			// nowhere to foward, we don't know anyone in this hierarchy!
 			// note: MAYBE flooding a request could find cached information
@@ -333,6 +345,40 @@ public class MultiDNS {
 		return addr;
 	}
 	
+	private InetAddress checkSelf(String servicename, DNSGroup group) {
+		// This function looks to see if a combination of service offered and
+		// groups joined can create the entire stringname (making this node 
+		// the responsible one.) If so, we can avoid resolution completely!
+		String[] hierarchy = servicename.split("\\.");
+		int namelen = hierarchy.length;
+
+		int groupscore = group.calculateScore(servicename);
+
+		// example: we are resolving john.csl.parc.global
+
+		if (groupscore == namelen + 1) {
+			// servicename was actually a groupname and we're a member!
+			if (this.address != null) {
+				return this.address;
+			} else {
+				return Service.generateAddress();
+			}
+		}
+
+		if (groupscore == namelen) {
+			// we are a member of "csl.parc.global"
+			// so search for "john" in our services
+			for (Service s : serviceList) {
+				if (s.name.equals(hierarchy[0])) {
+					return s.addr;
+				}
+			}
+		}
+
+		// can't possibly be true at this point!
+		return null;
+	}
+
 	public InetAddress forwardRequest(String servicename, DNSGroup group) {
 		// forward or rebroadcast the request to a different group if possible
 		// minScore ensures that we don't loop: we can only forward to another group

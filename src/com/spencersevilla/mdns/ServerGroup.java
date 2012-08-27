@@ -82,7 +82,15 @@ public class ServerGroup extends DNSGroup implements Runnable {
 
 				if(args[0].equals("SRV_REG")) {
 					String sname = args[1];
-					String addr = args[2];
+					InetAddress addr = null;
+	
+					try {
+						addr = InetAddress.getByName(args[2]);
+					} catch (UnknownHostException e) {
+						System.err.println("SG " + fullName + " error: invalid address given!");
+						continue;
+					}
+
 					Service s = new Service(sname, 0, mdns);
 					s.addr = addr;
 					serviceRegistered(s);
@@ -175,12 +183,7 @@ public class ServerGroup extends DNSGroup implements Runnable {
 		InetAddress a = null;
 		for (Service s : services) {
 			if (s.name.equals(servicename)) {
-				try {
-					a = InetAddress.getByName(s.addr);
-				} catch (UnknownHostException e) {
-					// do nothing?
-					continue;
-				}
+				a = s.addr;
 				break;
 			}
 		}

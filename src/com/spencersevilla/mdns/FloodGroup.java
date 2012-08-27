@@ -139,7 +139,7 @@ public class FloodGroup extends DNSGroup implements Runnable {
 	
 	// Generate response to FLD_REQ packets
 	private void parseReq(String servicename, InetAddress saddr, int sport) {
-		String addr = null;
+		InetAddress addr = null;
 		
 		if (isBestPossibleMatch(servicename)) {
 			// already in the best group. here, either we answer the req (if we can)
@@ -153,10 +153,7 @@ public class FloodGroup extends DNSGroup implements Runnable {
 		} else {
 			// here let's see if we can find a better-matching group? if so, then it's
 			// guaranteed that no-one in THIS group will respond so we should forward it
-			InetAddress a = mdns.forwardRequest(servicename, this);
-			if (a != null) {
-				addr = a.getHostAddress();
-			}
+			addr = mdns.forwardRequest(servicename, this);
 		}
 		
 		if (addr == null) {
@@ -168,7 +165,7 @@ public class FloodGroup extends DNSGroup implements Runnable {
 		try {
 			// we have the info for this group so go ahead and reply!
 			// note: the response we give uses the string they requested!
-			String bstring = new String("FLD_REP:" + servicename + ":" + addr);
+			String bstring = new String("FLD_REP:" + servicename + ":" + addr.getHostAddress());
 			System.out.println("FG " + fullName + ": sending " + bstring);
 			byte buf[] = bstring.getBytes();
 			DatagramPacket pack = new DatagramPacket(buf, buf.length, saddr, sport);

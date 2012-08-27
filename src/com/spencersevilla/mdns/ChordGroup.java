@@ -53,7 +53,10 @@ public class ChordGroup extends DNSGroup {
 	
 	// DNSGroup methods =========================================================
 	public void start() {
-		laddr = mdns.getAddr();
+		InetAddress a = mdns.getAddr();
+		if (a != null) {
+			laddr = a.getHostName();
+		}
 		if (laddr == null) {
 			try {
 				laddr = InetAddress.getLocalHost().getHostName();
