@@ -339,6 +339,7 @@ public class MultiDNS {
 		// if it's a better match than the group this request came from.
 		
 		DNSGroup g = findResponsibleGroup(servicename, group);
+
 		if (g == null) {
 			System.err.println("MDNS: cannot forward request " + servicename + ", so ignoring it.");
 			return null;
@@ -421,7 +422,12 @@ public class MultiDNS {
 				highScore = score;
 			}
 		}
-				
+		
+		// avoid looping! DO NOT rebroadcast a request on the group it came in on...
+		if (bestChoice == initial) {
+			bestChoice = null;
+		}
+
 		return bestChoice;
 	}
 		

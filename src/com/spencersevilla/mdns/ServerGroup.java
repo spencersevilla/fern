@@ -105,7 +105,7 @@ public class ServerGroup extends DNSGroup implements Runnable {
 	public void stop() {
 		System.out.println("SG " + fullName + ": stopped.");
 		if (!serving) {
-			for (Service s : mdns.serviceList) {
+			for (Service s : services) {
 				serviceRemoved(s);
 			}
 			return;
