@@ -133,7 +133,9 @@ public class FloodGroup extends DNSGroup implements Runnable {
 			// guaranteed that no-one in THIS group will respond so we should forward it
 			int score = calculateScore(servicename);
 			InetAddress a = mdns.forwardRequest(servicename, score);
-			addr = a.getHostAddress();
+			if (a != null) {
+				addr = a.getHostAddress();
+			}
 		}
 		
 		if (addr == null) {

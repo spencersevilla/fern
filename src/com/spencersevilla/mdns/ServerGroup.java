@@ -116,11 +116,13 @@ public class ServerGroup extends DNSGroup implements Runnable {
 	}
 	public void serviceRegistered(Service s) {
 		if (serving) {
+			System.out.println("SG " + fullName + " server: registering service " + s.name + " for address " + s.addr);
 			services.add(s);
 			return;
 		}
 
 		try {
+			System.out.println("SG " + fullName + " client: registering service " + s);
 			DatagramSocket sock = new DatagramSocket();
 
 			String send = new String("SRV_REG:" + s.name + ":" + s.addr);
@@ -136,11 +138,13 @@ public class ServerGroup extends DNSGroup implements Runnable {
 
 	public void serviceRemoved(Service s) {
 		if (serving) {
+			System.out.println("SG " + fullName + " server: removing service " + s.name);
 			services.remove(s);
 			return;
 		}
 
 		try {
+			System.out.println("SG " + fullName + " client: removing service " + s.name);
 			DatagramSocket sock = new DatagramSocket();
 
 			String send = new String("SRV_DEL:" + s.name);
@@ -160,11 +164,12 @@ public class ServerGroup extends DNSGroup implements Runnable {
 	}
 
 	public InetAddress resolveService(String name, int minScore) {
+		System.out.println("SG " + fullName + ": resolving " + name);
+
 		if (!serving) {
 			return mdns.forwardRequest(name, minScore, addr, 53);
 		}
 
-		System.out.println("SG " + fullName + ": resolving " + name);
 		String servicename = getServiceName(name);
 
 		InetAddress a = null;
