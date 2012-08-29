@@ -420,7 +420,6 @@ class InterGroupThread extends Thread {
 
 			return retval;
 		} catch (SocketTimeoutException e) {
-			System.err.println("dns forward-request timed out, returning (null)");
 			return null;
 		} catch (Exception e) {
 			e.printStackTrace();

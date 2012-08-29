@@ -76,7 +76,6 @@ public class FloodGroup extends DNSGroup implements Runnable {
 
         // code to record ALL self-ip addresses so we can ignore them!
 		try {
-			System.out.println("Full list of Network Interfaces:");
 			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 				NetworkInterface intf = en.nextElement();
 				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
@@ -102,10 +101,8 @@ public class FloodGroup extends DNSGroup implements Runnable {
 		        // FIRST: check to make sure that we aren't asking ourself!
 		        if (self_addrs.contains(pack.getAddress())) {
 		        	continue;
-		        } else {
-		        	System.out.println("address from: " + pack.getAddress());
 		        }
-				
+		        				
 				String data = new String(pack.getData());
 				String[] args = data.split(":");
 				System.out.println("FG " + fullName + ": received " + data);
