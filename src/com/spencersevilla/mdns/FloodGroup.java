@@ -17,11 +17,16 @@ public class FloodGroup extends DNSGroup implements Runnable {
     private MulticastSocket socket;
     private ArrayList<InetAddress> self_addrs;
 
+    private InetAddress parent_addr;
+    private String parent_name; 
+
 	// Constructor and Bookkeeping Methods
 	FloodGroup(MultiDNS m, String n) {
 		super(m, n);
 		self_addrs = new ArrayList<InetAddress>();
 		serviceHash = new HashMap();
+		parent_addr = null;
+		parent_name = null;
 	}
 	
 	FloodGroup(MultiDNS m, ArrayList<String> nameArgs) {
@@ -30,6 +35,8 @@ public class FloodGroup extends DNSGroup implements Runnable {
 		super(m, nameArgs.get(0));
 		serviceHash = new HashMap();
 		self_addrs = new ArrayList<InetAddress>();
+		parent_addr = null;
+		parent_name = null;
 
 		if (nameArgs.size() > 1) {
 			addr = nameArgs.get(1);
@@ -86,6 +93,13 @@ public class FloodGroup extends DNSGroup implements Runnable {
 			System.out.println(" (error retrieving network interface list)");
 		}
 
+		// only findParent if we aren't top-level and we don't have a direct link
+		int index = fullName.indexOf(".");
+		if (index != -1 && index + 1 < fullName.length() && parent == null) {
+			parent_name = fullName.substring(index + 1);
+			findParent();
+		}
+
         try {
 			socket = new MulticastSocket(port);
 	        socket.joinGroup(InetAddress.getByName(addr));
@@ -107,23 +121,27 @@ public class FloodGroup extends DNSGroup implements Runnable {
 				String[] args = data.split(":");
 				System.out.println("FG " + fullName + ": received " + data);
 		        
-				if (args.length < 3) {
-					System.err.println("FG " + fullName + ": incorrect number of args!");
-					continue;
-				}
-								
-				if(!args[0].equals("FLD_REQ")) {
-					System.err.println("FG " + fullName + ": incorrect command!");
-					continue;
-				}
-				
+		        if (args.length < 2) {
+		        	System.err.println("FG " + fullName + ": incorrect number of args!");
+		        	continue;
+		        }
+
 				if (!args[1].equals(fullName)) {
 					System.err.println("FG " + fullName + ": should not have received this request!");
 					continue;
 				}
+
+				if (args[0].equals("PARENT_REQ")) {
+					parentReq(args, pack.getAddress(), pack.getPort());
+
+				} else if(args[0].equals("FLD_REQ")) {
+					parseReq(args, pack.getAddress(), pack.getPort());
+
+				} else {
+					System.err.println("FG " + fullName + ": incorrect command!");
+					continue;
+				}
 				
-				String servicename = args[2].trim();
-				parseReq(servicename, pack.getAddress(), pack.getPort());
 			}
 			
 			socket.leaveGroup(InetAddress.getByName(addr));
@@ -134,9 +152,34 @@ public class FloodGroup extends DNSGroup implements Runnable {
         }
 	} 
 	
+	private void parentReq(String[] args, InetAddress saddr, int sport) {
+		// issue a response message if we are also a member of the parent
+		// group! (thus requests can be unicast to us...)
+		if (parent == null) {
+			return;
+		}
+
+		// we can talk to the parent group, so go ahead and reply!
+		try {
+			String bstring = new String("PARENT_REP:" + fullName);
+			System.out.println("FG " + fullName + ": sending " + bstring);
+			byte buf[] = bstring.getBytes();
+			DatagramPacket pack = new DatagramPacket(buf, buf.length, saddr, sport);
+			socket.send(pack);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	// Generate response to FLD_REQ packets
-	private void parseReq(String servicename, InetAddress saddr, int sport) {
+	private void parseReq(String[] args, InetAddress saddr, int sport) {
 		InetAddress addr = null;
+
+		if (args.length < 3) {
+			System.err.println("FG " + fullName + ": incorrect number of args!");
+			return;
+		}
+		String servicename = args[2].trim();
 		
 		if (isBestPossibleMatch(servicename)) {
 			// already in the best group. here, either we answer the req (if we can)
@@ -171,18 +214,86 @@ public class FloodGroup extends DNSGroup implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
+
+	private void findParent() {
+		System.out.println("FG " + fullName + ": searching for parent");
+		String bstring = new String("PARENT_REQ:" + fullName);
+		byte buf[] = bstring.getBytes();
+		byte buf2[] = new byte[1024];
+
+        DatagramPacket pack2 = new DatagramPacket(buf2, buf2.length);
+
+		try {
+			DatagramPacket pack = new DatagramPacket(buf, buf.length, InetAddress.getByName(addr), port);
+
+			MulticastSocket s = new MulticastSocket();
+
+			// wait 10 seconds
+			s.setSoTimeout(10000);
+
+	        s.send(pack);
+			s.receive(pack2);
+			// try-catch-exception breaks here
+			s.close();
+			
+			String data = new String(pack2.getData());
+			System.out.println("FG " + fullName + ": received " + data);
+			
+			String[] args = data.split(":");
+
+			if (args.length < 2) {
+				// received not enough info...
+				return;
+			}
+
+			if(!args[0].equals("PARENT_REP")) {
+				// recieved a string but it's not what we want...
+				return;
+			}
+
+			if (!args[1].equals(name)) {
+				// wrong service! ignore...
+				return;
+			}
+
+			parent_addr = pack2.getAddress();
+			return;
+		} catch (InterruptedIOException iioe) {
+			System.out.println("FG " + fullName + ": timeout, parent not found?");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return;
+	}
+
+	private boolean chooseParent(String servicename) {
+		if (parent_addr == null || parent_name == null) {
+			return false;
+		}
+
+		if (parent != null) {
+			System.out.println("WHAT? Why do we have a parent and parent_addr?");
+			return false;
+		}
+
+		return (DNSGroup.calculateScore(servicename, parent_name) >= calculateScore(servicename));
+	}
+
 	// Client-Side when service-resolution requested!
 	public InetAddress resolveService(String name) {
 		return resolveService(name, 0);
 	}
-	
+
 	public InetAddress resolveService(String name, int minScore) {
 		System.out.println("FG " + fullName + ": resolving " + name);
+
+		if (chooseParent(name)) {
+			return mdns.forwardRequest(name, this, parent_addr, 53);
+		}
+
 		String bstring = new String("FLD_REQ:" + fullName + ":" + name);
 		byte buf[] = bstring.getBytes();
 		byte buf2[] = new byte[1024];
-
         DatagramPacket pack2 = new DatagramPacket(buf2, buf2.length);
 
 		try {

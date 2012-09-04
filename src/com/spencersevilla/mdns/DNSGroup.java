@@ -77,8 +77,16 @@ public abstract class DNSGroup {
 	}
 
 	protected final int calculateScore(String servicename) {
+		return DNSGroup.calculateScore(servicename, fullName);
+	}
+
+	protected static final int calculateScore(String servicename, String groupname) {
 		String[] names = servicename.split("\\.");
 		Collections.reverse(Arrays.asList(names));
+
+		String[] groups = groupname.split("\\.");
+		Collections.reverse(Arrays.asList(groups));
+
 		int count = 0;
 		// the DNSGroup may have a longer name than we specify
 		// but this cannot be the other way around!
