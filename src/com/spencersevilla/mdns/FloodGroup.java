@@ -126,8 +126,9 @@ public class FloodGroup extends DNSGroup implements Runnable {
 		        	continue;
 		        }
 
-				if (!args[1].equals(fullName)) {
-					System.err.println("FG " + fullName + ": should not have received this request!");
+		        String name = args[1].trim();
+				if (!name.equals(fullName)) {
+					System.err.println("FG " + fullName + ": should not have received this request: " + args[1]);
 					continue;
 				}
 
