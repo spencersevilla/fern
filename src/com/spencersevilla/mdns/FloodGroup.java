@@ -244,20 +244,24 @@ public class FloodGroup extends DNSGroup implements Runnable {
 
 			if (args.length < 2) {
 				// received not enough info...
+				System.err.println("FG " + fullName + " getParent error: not enough args!");
 				return;
 			}
 
 			if(!args[0].equals("PARENT_REP")) {
 				// recieved a string but it's not what we want...
+				System.err.println("FG " + fullName + " getParent error: incorrect command!");
 				return;
 			}
 
-			if (!args[1].equals(name)) {
-				// wrong service! ignore...
+			String name = args[1].trim();
+			if (!name.equals(name)) {
+				System.err.println("FG " + fullName + " getParent error: incorrect groupname!");
 				return;
 			}
 
 			parent_addr = pack2.getAddress();
+			System.out.println("FG " + fullName + ": found parent at " + parent_addr);
 			return;
 		} catch (InterruptedIOException iioe) {
 			System.out.println("FG " + fullName + ": timeout, parent not found?");
@@ -269,6 +273,7 @@ public class FloodGroup extends DNSGroup implements Runnable {
 
 	private boolean chooseParent(String servicename) {
 		if (parent_addr == null || parent_name == null) {
+			System.out.println("chooseParent error");
 			return false;
 		}
 
