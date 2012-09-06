@@ -349,6 +349,12 @@ public class MultiDNS {
 		// This function looks to see if a combination of service offered and
 		// groups joined can create the entire stringname (making this node 
 		// the responsible one.) If so, we can avoid resolution completely!
+
+		// FIRST: we don't even have a group hit here, so we can't possibly be a match!
+		if (group == null) {
+			return null;
+		}
+
 		String[] hierarchy = servicename.split("\\.");
 		int namelen = hierarchy.length;
 
