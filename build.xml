@@ -41,6 +41,18 @@
 		</java>
 	</target>
 
+	<target name="debug" depends="jar">
+		<java fork="true" classname="${main-class}">
+			<classpath>
+				<path refid="classpath" />
+				<path path="${config.dir}" />
+				<path location="${jar.dir}/${ant.project.name}.jar" />
+			</classpath>
+			<jvmarg value="-Xdebug" />
+			<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,address=6000" />
+		</java>
+	</target>
+
 	<target name="clean-build" depends="clean,jar"/>
 
 	<target name="main" depends="clean,run"/>
