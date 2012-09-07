@@ -24,7 +24,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		m.mdns = new MultiDNS();
 		m.gui = new SwingGui(m.mdns);
 
-		if (m.mdns == null || m.gui == null) {
+		if (m.mdns == null) {
 			System.out.println("error: could not initialize mdns!");
 			System.exit(0);
 		}

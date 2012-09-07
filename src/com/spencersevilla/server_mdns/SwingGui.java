@@ -11,6 +11,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.HeadlessException;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -68,14 +69,19 @@ public class SwingGui {
 	public SwingGui(MultiDNS m) throws Exception {
 		mdns = m;
 
-		createGroupsWindow();
-		createServicesWindow();
-		createJoinGroupWindow();
-		createNewServiceWindow();
-		createNewGroupWindow();
+		try {
+			createGroupsWindow();
+			createServicesWindow();
+			createJoinGroupWindow();
+			createNewServiceWindow();
+			createNewGroupWindow();
+		} catch (HeadlessException e) {
+			System.out.println("WARNING: system running headless, could not start SwingGui");
+		}
+
 	}
 
-	private void createGroupsWindow() throws Exception {
+	private void createGroupsWindow() throws HeadlessException {
 		// Makes the menus appear in the proper spot on the Mac top bar
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		
