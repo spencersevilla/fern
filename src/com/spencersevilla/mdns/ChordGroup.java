@@ -280,7 +280,7 @@ public class ChordGroup extends DNSGroup {
 		// "parent" of this group since, presumably, we are a member of the
 		// parent-group and can forward traffic onward appropriately.
 		if (groups.length > 1) {
-			Service s = new Service("parent", 0, this);
+			Service s = new Service("parent", 0, mdns);
 			serviceRegistered(s);
 		}
 	}
