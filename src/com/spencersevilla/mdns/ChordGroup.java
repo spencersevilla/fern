@@ -178,7 +178,7 @@ public class ChordGroup extends DNSGroup {
 		
 		System.out.println("CG " + fullName + ": resolving " + name);
 
-		// STEP 1: PRODUCE A SERVICENAME!
+		// STEP 1: Produce the key we're looking for!
 		String servicename = getServiceName(name);
 		
 		Set set;
