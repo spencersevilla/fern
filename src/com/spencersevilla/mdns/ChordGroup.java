@@ -275,6 +275,14 @@ public class ChordGroup extends DNSGroup {
 		}
 		
 		System.out.println("CG " + fullName + ": created chord, serving at " + laddr + ":"+ lport);
+
+		// WE created a chord that's not top-level! register ourself as the 
+		// "parent" of this group since, presumably, we are a member of the
+		// parent-group and can forward traffic onward appropriately.
+		if (groups.length > 1) {
+			Service s = new Service("parent", 0, this);
+			serviceRegistered(s);
+		}
 	}
 	
 	private void joinChord() {
