@@ -96,6 +96,7 @@ public class InterGroupServer implements Runnable {
         	socket.close();
 
  		} catch (Exception e) {
+ 			System.out.println("DEBUG: closed = " + socket.isClosed() + " connected = " + socket.isConnected());
             e.printStackTrace();
         }
 	}
