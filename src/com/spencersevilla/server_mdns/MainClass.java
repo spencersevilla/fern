@@ -2,6 +2,7 @@ package com.spencersevilla.server_mdns;
 import com.spencersevilla.mdns.*;
 
 import org.apache.commons.daemon.*;
+import de.uniba.wiai.lspi.chord.service.PropertiesLoader;
 
 import java.io.*;
 import java.util.*;
@@ -73,6 +74,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 	}
 
 	public void start() throws Exception {
+		de.uniba.wiai.lspi.chord.service.PropertiesLoader.loadPropertyFile();
 		mdns.start();
 		readConf(conf);
 		System.out.println("daemon: started.");
