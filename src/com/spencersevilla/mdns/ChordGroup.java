@@ -34,19 +34,23 @@ public class ChordGroup extends DNSGroup implements Runnable {
 		services = new ArrayList<Service>();
 
 		if (nameArgs.get(1).equals("create")) {
-			if (nameArgs.size() > 2) {
-				lport = Integer.parseInt(nameArgs.get(2));
-			}
-		} else if (nameArgs.get(1).equals("join")) {
 			if (nameArgs.size() < 4) {
 				System.err.println("CG " + fullName + " init error: invalid init string!");
 			}
+
+			laddr = nameArgs.get(2);
+			lport = Integer.parseInt(nameArgs.get(3));
+
+		} else if (nameArgs.get(1).equals("join")) {
+			if (nameArgs.size() < 6) {
+				System.err.println("CG " + fullName + " init error: invalid init string!");
+			}
+
 			daddr = nameArgs.get(2);
 			dport = Integer.parseInt(nameArgs.get(3));
+			laddr = nameArgs.get(4);
+			lport = Integer.parseInt(nameArgs.get(5));
 
-			if (nameArgs.size() > 4) {
-				lport = Integer.parseInt(nameArgs.get(4));
-			}
 		} else {
 			System.err.println("CG " + fullName + " init error: invalid command " + nameArgs.get(1));
 		}
