@@ -113,73 +113,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		String line = null;
 		try {
 			while ((line = br.readLine()) != null) {
-				StringTokenizer st = new StringTokenizer(line);
-
-				if (!st.hasMoreTokens()) {
-					continue;
-				}
-
-	        	String type = st.nextToken();
-
-	        	// for our commenting lines!
-	        	if (type.charAt(0) == '#')
-					continue;
-
-				if (type.equals("ADDR")) {
-					String addr = st.nextToken();
-					mdns.setAddr(addr);
-					
-				} else if (type.equals("SERVICE")) {
-	        		String servicename = st.nextToken();
-	        		mdns.createService(servicename);
-
-
-				} else if (type.equals("DNS")) {
-					String name = st.nextToken();
-					String addr = st.nextToken();
-					mdns.addDNSServer(name, addr);
-
-				} else if (type.equals("GROUP")) {
-	        		String command = st.nextToken();
-	        		if (command.equals("TOP")) {
-	        			int gid = Integer.parseInt(st.nextToken());
-	        			ArrayList<String> args = new ArrayList<String>();
-	        			while (st.hasMoreTokens()) {
-	        				args.add(st.nextToken());
-	        			}
-
-	        			DNSGroup group = mdns.createGroup(gid, args);
-
-	        			if (group == null) {
-	        				continue;
-	        			}
-	        			mdns.joinGroup(group);
-
-	        		} else if (command.equals("SUB")) {
-	        			String parent_name = st.nextToken();
-
-	        			// lookup DNSGroup here
-	        			DNSGroup parent = mdns.findGroupByName(parent_name);
-
-	        			if (parent == null) {
-	        				continue;
-	        			}
-
-	        			int gid = Integer.parseInt(st.nextToken());
-	        			ArrayList<String> args = new ArrayList<String>();
-	        			while (st.hasMoreTokens()) {
-	        				args.add(st.nextToken());
-	        			}
-
-	        			DNSGroup group = mdns.createSubGroup(parent, gid, args);
-
-	        			if (group == null) {
-	        				continue;
-	        			}
-	        			mdns.joinGroup(group);
-	        		}
-	        	}
-
+				mdns.readCommandLine(line);
 	        }
 		} catch (IOException e) {
 			// do nothing special here, we've already broken out of the loop
