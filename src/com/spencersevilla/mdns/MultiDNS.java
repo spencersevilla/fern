@@ -267,7 +267,11 @@ public class MultiDNS {
 			group.serviceRegistered(s);
 		}
 		
-		Thread.sleep(1000);
+		try{
+			Thread.sleep(1000);
+		} catch (Exception e) {
+			// do nothing; continue normally
+		}
 		// saveGroups();
 	}
 	
