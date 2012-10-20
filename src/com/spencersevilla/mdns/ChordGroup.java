@@ -18,9 +18,9 @@ public class ChordGroup extends DNSGroup implements Runnable {
 	private Thread thread;
 	private Chord chord;
 	private boolean running;
-	public String laddr = null;
+	public InetAddress laddr = null;
 	public int lport = 0;
-	public String daddr = null;
+	public InetAddress daddr = null;
 	public int dport = 0;
 	private ArrayList<Service> services;
 
@@ -36,23 +36,38 @@ public class ChordGroup extends DNSGroup implements Runnable {
 		if (nameArgs.get(1).equals("create")) {
 			if (nameArgs.size() < 4) {
 				System.err.println("CG " + fullName + " init error: invalid init string!");
+				return;
 			}
 
-			laddr = nameArgs.get(2);
+			try {
+				laddr = InetAddress.getByName(nameArgs.get(2));
+			} catch (Exception e) {
+				System.err.println("CG " + fullName + " init error: invalid address!");
+				return;
+			}
+
 			lport = Integer.parseInt(nameArgs.get(3));
 
 		} else if (nameArgs.get(1).equals("join")) {
 			if (nameArgs.size() < 6) {
 				System.err.println("CG " + fullName + " init error: invalid init string!");
+				return;
 			}
 
-			daddr = nameArgs.get(2);
+			try {
+				daddr = InetAddress.getByName(nameArgs.get(2));
+				laddr = InetAddress.getByName(nameArgs.get(4));
+			} catch (Exception e) {
+				System.err.println("CG " + fullName + " init error: invalid address!");
+				return;
+			}
+
 			dport = Integer.parseInt(nameArgs.get(3));
-			laddr = nameArgs.get(4);
 			lport = Integer.parseInt(nameArgs.get(5));
 
 		} else {
 			System.err.println("CG " + fullName + " init error: invalid command " + nameArgs.get(1));
+			return;
 		}
 	}
 	
@@ -135,12 +150,13 @@ public class ChordGroup extends DNSGroup implements Runnable {
 	}
 	
 	public void serviceRegistered(Service s) {
-		s.addr = laddr;
+		
 		if (chord == null) {
 			System.err.println("CG " + fullName + " serviceRegistered error: chord == null");
 			return;
 		}
 		
+		s.addr = laddr;
 		StringKey key = new StringKey(s.name);
 		
 		try {
@@ -267,7 +283,7 @@ public class ChordGroup extends DNSGroup implements Runnable {
 		URL localURL = null;
 		
 		try {
-			localURL = new URL(protocol + "://" + laddr + ":" + lport + "/");
+			localURL = new URL(protocol + "://" + laddr.getHostAddress() + ":" + lport + "/");
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
@@ -302,8 +318,8 @@ public class ChordGroup extends DNSGroup implements Runnable {
 		}
 				
 		try {
-			localURL = new URL(protocol + "://" + laddr + ":" + lport + "/");
-			joinURL = new URL(protocol + "://" + daddr + ":" + dport +"/");
+			localURL = new URL(protocol + "://" + laddr.getHostAddress() + ":" + lport + "/");
+			joinURL = new URL(protocol + "://" + daddr.getHostAddress() + ":" + dport +"/");
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
@@ -315,7 +331,7 @@ public class ChordGroup extends DNSGroup implements Runnable {
 			throw new RuntimeException("CG " + fullName + " error: could not join!", e);
 		}
 		
-		System.out.println("CG " + fullName + ": joined chord at " + daddr + ":" + dport + ", serving on local port " + lport);
+		System.out.println("CG " + fullName + ": joined chord at " + daddr + ":" + dport + ", serving at " + laddr + ":" + lport);
 	}
 	
 	public static int findFreePort() {
