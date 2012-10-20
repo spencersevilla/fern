@@ -97,10 +97,10 @@ public class MultiDNS {
 		return address;
 	}
 
-	public void addDNSServer(String name, String address) {
+	public void addDNSServer(String address) {
 		try {
 			InetAddress addr = InetAddress.getByName(address);
-			igs.addDNSServer(name, addr);
+			igs.addDNSServer(addr);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -483,7 +483,7 @@ public class MultiDNS {
 	       	String type = st.nextToken();
 	       	// for our commenting lines!
 	       	if (type.charAt(0) == '#')
-				throw new RuntimeException();
+				return;
 
 			if (type.equals("ADDR")) {
 				String addr = st.nextToken();
@@ -495,9 +495,8 @@ public class MultiDNS {
 
 
 			} else if (type.equals("DNS")) {
-				String name = st.nextToken();
 				String addr = st.nextToken();
-				addDNSServer(name, addr);
+				addDNSServer(addr);
 
 			} else if (type.equals("GROUP")) {
 
