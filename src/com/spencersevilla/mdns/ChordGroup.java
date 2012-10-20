@@ -100,6 +100,7 @@ public class ChordGroup extends DNSGroup implements Runnable {
 		}
 
 		Service s = new Service(name, 1000, mdns);
+		s.addr = laddr;
 		StringKey key = new StringKey(s.name);		
 		Set set;
 		
@@ -134,6 +135,7 @@ public class ChordGroup extends DNSGroup implements Runnable {
 	}
 	
 	public void serviceRegistered(Service s) {
+		s.addr = laddr;
 		if (chord == null) {
 			System.err.println("CG " + fullName + " serviceRegistered error: chord == null");
 			return;
