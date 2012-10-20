@@ -267,6 +267,7 @@ public class MultiDNS {
 			group.serviceRegistered(s);
 		}
 		
+		Thread.sleep(1000);
 		// saveGroups();
 	}
 	
