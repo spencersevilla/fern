@@ -68,15 +68,6 @@ public class ChordGroup extends DNSGroup implements Runnable {
 	}
 
 	public void run() {
-		InetAddress a = mdns.getAddr();
-		if (a == null) {
-			a = Service.generateAddress();
-		}
-
-		if (a != null) {
-			laddr = a.getHostAddress();
-		}
-
 		if (laddr == null) {
 				System.err.println("CG " + fullName + " start: no IP address?");
 				return;
