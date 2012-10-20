@@ -113,7 +113,9 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		String line = null;
 		try {
 			while ((line = br.readLine()) != null) {
-				mdns.readCommandLine(line);
+				if (!line.equals("")) {
+					mdns.readCommandLine(line);					
+				}
 	        }
 		} catch (IOException e) {
 			// do nothing special here, we've already broken out of the loop
