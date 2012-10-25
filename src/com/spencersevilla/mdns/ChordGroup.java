@@ -101,7 +101,8 @@ public class ChordGroup extends DNSGroup implements Runnable {
 	}
 
 	public void stop() {
-		for (Service s : services) {
+		for (Iterator<Service> it = services.iterator(); it.hasNext(); ) {
+			Service s = it.next();
 			serviceRemoved(s);
 		}
 
