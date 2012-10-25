@@ -311,6 +311,9 @@ public class MultiDNS {
 			servicename = servicename.substring(0, servicename.length() - 1);
 		}
 
+		// Start timer!
+		long start_time = System.currentTimeMillis();
+
 		// "group" is the best-match-DNS-group available to us!
 		DNSGroup group = findResponsibleGroup(servicename);
 
@@ -323,6 +326,7 @@ public class MultiDNS {
 		// NEXT: do we have any cached group information?
 		addr = askCache(servicename, group);
 		if (addr != null) {
+			System.out.println("MDNS: request for " + servicename + " hit cache.");
 			return addr;
 		}
 
@@ -336,6 +340,8 @@ public class MultiDNS {
 		}
 		
 		addr = group.resolveService(servicename);
+		long elapsed_millis = System.currentTimeMillis() - start_time;
+		System.out.println("MDNS: request for " + servicename + " took " + elapsed_millis + " milliseconds.");
 		return addr;
 	}
 	
