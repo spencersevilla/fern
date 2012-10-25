@@ -47,7 +47,6 @@ public class InterGroupServer implements Runnable {
 		// abort all running requests
 		for (Iterator<InterGroupThread> it = threads.iterator(); it.hasNext(); ) {
 			InterGroupThread t = it.next();
-			t.cleanup();
 			it.remove();
 		}
 	}
@@ -86,7 +85,6 @@ public class InterGroupServer implements Runnable {
         	socket.close();
 
  		} catch (Exception e) {
- 			System.out.println("DEBUG: closed = " + socket.isClosed() + " connected = " + socket.isConnected());
             e.printStackTrace();
         }
 	}
@@ -442,12 +440,6 @@ class InterGroupThread extends Thread {
 	}
 
 	public void exit() {
-		cleanup();
 		array.remove(this);
-	}
-
-	public void cleanup() {
-		socket.close();
-		return;
 	}
 }
