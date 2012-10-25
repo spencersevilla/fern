@@ -71,11 +71,6 @@ public class MultiDNS {
 
 	public void exit() {
 		System.out.println("CLEAN UP MDNS HERE!");
-
-		// call "exit" on every service we're a part of
-		for (DNSGroup group : groupList) {
-			group.stop();
-		}
 	}
 
 	public void setAddr(String addr) {
