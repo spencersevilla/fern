@@ -241,7 +241,7 @@ public class MultiDNS {
 	}
 
 	public void leaveGroup(DNSGroup g) {
-		g.exit();
+		g.stop();
 		groupList.remove(g);
 	}
 	
@@ -546,6 +546,9 @@ public class MultiDNS {
 
 					joinGroup(group);
 				}
+			} else if (type.equals("CACHE")) {
+				String name = st.nextToken();
+				// InetAddress
 			}
 		} catch (RuntimeException e) {
 			System.out.println("MDNS: error: could not parse command line: " + commandline);
