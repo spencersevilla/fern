@@ -356,6 +356,13 @@ public class ChordGroup extends DNSGroup implements Runnable {
 		}
 		
 		System.out.println("CG " + fullName + ": joined chord at " + daddr + ":" + dport + ", serving at " + laddr + ":" + lport);
+
+		// We joined a Chord but we're ALSO a member of its parent-group,
+		// so go ahead and add ourselves to the key "parent" :-)
+		if (parent != null) {
+			Service s = new Service("parent", 0, mdns);
+			serviceRegistered(s);
+		}
 	}
 	
 	public static int findFreePort() {
