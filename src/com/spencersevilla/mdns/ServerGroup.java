@@ -115,11 +115,12 @@ public class ServerGroup extends DNSGroup implements Runnable {
 	}
 
 	public void stop() {
-		System.out.println("SG " + fullName + ": stopped.");
 		if (!serving) {
 			for (Service s : services) {
 				serviceRemoved(s);
 			}
+
+			System.out.println("SG " + fullName + ": stopped.");
 			return;
 		}
 
@@ -141,6 +142,7 @@ public class ServerGroup extends DNSGroup implements Runnable {
 			byte[] data = send.getBytes();
 			DatagramPacket pack = new DatagramPacket(data, data.length, addr, port);
 			sock.send(pack);
+			services.add(s);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -163,6 +165,7 @@ public class ServerGroup extends DNSGroup implements Runnable {
 			byte[] data = send.getBytes();
 			DatagramPacket pack = new DatagramPacket(data, data.length, addr, port);
 			sock.send(pack);
+			services.remove(s);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
