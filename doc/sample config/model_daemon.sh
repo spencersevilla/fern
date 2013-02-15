@@ -3,8 +3,8 @@
 # Setup variables
 EXEC=jsvc
 JAVA_HOME="/usr/libexec/java_home"
-CLASS_PATH="./lib/*:./config:./jar/MultiDNS.jar"
-CLASS=com.spencersevilla.server_mdns.MainClass
+CLASS_PATH="./lib/*:./config:./jar/FERNManager.jar"
+CLASS=com.spencersevilla.fern.server.MainClass
 USER=ssevilla
 PID=/tmp/example.pid
 LOGFILE=logs/mdns_log.txt

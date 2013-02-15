@@ -3,7 +3,7 @@
  *  public interface for a mdns server to request service-resolution from another computer.
  */
 
-package com.spencersevilla.mdns;
+package com.spencersevilla.fern;
 
 import java.io.*;
 import java.net.*;
@@ -12,16 +12,17 @@ import org.xbill.DNS.*;
 
 public class InterGroupServer implements Runnable {
 
-	protected MultiDNS mdns;
+	public static final int port = 53;
+
+	protected FERNManager mdns;
 	private Thread thread;
-	public static int port = 53;
     protected DatagramSocket socket;
 	private boolean listening;
 	private volatile boolean running;
 	protected ArrayList<InterGroupThread> threads;
 	protected ArrayList<InetAddress> dns_addrs;
 
-	InterGroupServer(MultiDNS m) throws Exception {
+	InterGroupServer(FERNManager m) throws Exception {
 		mdns = m;
 		threads = new ArrayList<InterGroupThread>();
 		socket = new DatagramSocket(port);
@@ -89,13 +90,14 @@ public class InterGroupServer implements Runnable {
         }
 	}
 	
-	public InetAddress resolveService(String servicename, int score, InetAddress addr, int port) {
+	public static FERNObject resolveName(Request request, InetAddress addr, int port) {
 		try {
-			byte[] sendbuf = generateRequest(servicename);
+			byte[] sendbuf = generateRequest(request);
 			if (sendbuf == null) {
 				System.err.println("IGS error: sendbuf is null");
 				return null;
 			}
+
 			DatagramPacket sendpack = new DatagramPacket(sendbuf, sendbuf.length, addr, port);
 
 			byte[] recbuf = new byte[1024];
@@ -103,19 +105,17 @@ public class InterGroupServer implements Runnable {
 			DatagramSocket sock = new DatagramSocket();
 			sock.setSoTimeout(10000);
 
-			System.out.println("IGS: requesting " + servicename + " from " + addr + ":" + port);
+			System.out.println("IGS: requesting " + request + " from " + addr + ":" + port);
 
-			long start_time = System.currentTimeMillis();
 			sock.send(sendpack);
 
 			// Timeout Breaks Here!
 			sock.receive(recpack);
-			long elapsed_millis = System.currentTimeMillis() - start_time;
 
 			Message m = new Message(recpack.getData());
-			InetAddress result = parseResponse(m);
+			FERNObject result = parseResponse(m);
 
-			System.out.println("IGS: " + addr + ":" + port + " returned " + result + " for " + servicename + " in " + elapsed_millis + " milliseconds.");
+			System.out.println("IGS: " + addr + ":" + port + " returned " + result + " for " + request);
 
 			return result;
 		} catch (SocketTimeoutException e) {
@@ -127,27 +127,17 @@ public class InterGroupServer implements Runnable {
 		return null;
 	}
 
-	byte[] generateRequest(String name) {
-		try {
-			if (!name.endsWith(".")) {
-				name = name.concat(".");
-			}
+	private static byte[] generateRequest(Request request) {
+			Name name = request.name;
+			name.fernify();
+			org.xbill.DNS.Name n = name.toDNSName();
 
-			if (!name.endsWith("dssd.")) {
-				name = name.concat("dssd.");
-			}
-
-			Name n = new Name(name);
-			Record query = Record.newRecord(n, Type.A, DClass.IN);
-			Message request = Message.newQuery(query);
-			return request.toWire();
-		} catch (TextParseException e) {
-			System.err.println("IGS error: could not generate request");
-			return null;
-		}
+			Record query = Record.newRecord(n, Type.ANY, DClass.IN);
+			Message message = Message.newQuery(query);
+			return message.toWire();
 	}
 
-	InetAddress parseResponse(Message response) {
+	private static FERNObject parseResponse(Message response) {
 		Header header = response.getHeader();
 
 		if (!header.getFlag(Flags.QR)) {
@@ -164,21 +154,18 @@ public class InterGroupServer implements Runnable {
 
 		Record[] records = response.getSectionArray(Section.ANSWER);
 
-		// simplest alg: just return the first valid A record...
+		// simplest alg: just return the first valid record...
 		Record answer = null;
+		FERNObject object = null;
 		for(int i = 0; i < records.length; i++) {
 			answer = records[i];
-			if (answer.getType() != Type.A) {
+
+			object = new FERNObject(answer);
+			if (object == null) {
 				continue;
 			}
 
-			byte[] address = answer.rdataToWireCanonical();
-			try {
-				InetAddress result = InetAddress.getByAddress(address);
-				return result;
-			} catch (UnknownHostException e) {
-				continue;
-			}
+			return object;
 		}
 
 		return null;
@@ -191,7 +178,7 @@ class InterGroupThread extends Thread {
 	static final int FLAG_SIGONLY = 2;
 
 	DatagramPacket inpacket = null;
-    MultiDNS mdns = null;
+    FERNManager mdns = null;
 	ArrayList<InterGroupThread> array = null;
 	DatagramSocket socket = null;
 	InterGroupServer server = null;
@@ -288,7 +275,10 @@ class InterGroupThread extends Thread {
 
 	byte generateAnswer(Message query, Message response, int flags) {
 		Record queryRecord = query.getQuestion();
-		Name name = queryRecord.getName();
+		Name name = new Name(queryRecord.getName());
+		name.unfern();
+		Request request = new Request(name);
+
 		int type = queryRecord.getType();
 		int dclass = queryRecord.getDClass();
 		byte rcode = Rcode.NOERROR;
@@ -298,47 +288,21 @@ class InterGroupThread extends Thread {
 			return Rcode.NOTIMP;
 		}
 
-    	String nameString = name.toString();
-
-		// ok now remove the dns format-key from it
-		if (nameString.endsWith(".")) {
-			nameString = nameString.substring(0, nameString.length() - 1);
+		FERNObject object = mdns.resolveService(request);
+		if (object == null) {
+			return Rcode.NXDOMAIN;
 		}
 
-		if (nameString.endsWith(".dssd")) {
-			nameString = nameString.substring(0, nameString.length() - 5);
-		} else {
-			// what the hell happened? we already checked for this!
-			return Rcode.REFUSED;
-		}
+		Record rec = object.record;
+		RRset r = new RRset(rec);
+		addRRset(queryRecord.getName(), response, r, Section.ANSWER, flags);
 
-		if (type == Type.A) {
-			// They are asking to resolve a stringname to an address...
-			// So, standard-operating-procedure basically!
-			InetAddress addr = mdns.resolveService(nameString);
+		return Rcode.NOERROR;
 
-			System.out.println("IGS: returning " + addr + " for " + name);
-
-			if (addr == null) {
-				return Rcode.NXDOMAIN;
-			}
-
-			byte[] rdata = addr.getAddress();
-
-			Record rec = Record.newRecord(name, type, dclass, ttl, rdata);
-			RRset r = new RRset(rec);
-
-			addRRset(name, response, r, Section.ANSWER, flags);
-			return Rcode.NOERROR;
-		} else if (type == Type.CNAME) {
-			// domain name aliases here? Not exactly sure how we
-			// want to handle this situation, so ignore for now!
-		} else if (type == Type.NS) {
-			// Here the request entails a nameserver-lookup
-			// Which means that this is really an intermediate-request
-			// and we want to return the pointer to the next server?
-		}
-		return Rcode.REFUSED;
+		// if (type == Type.A) {
+		// } else if (type == Type.CNAME) {
+		// } else if (type == Type.NS) {
+		// }
 	}
 
 	boolean shouldForward(Message query) {
@@ -352,7 +316,7 @@ class InterGroupThread extends Thread {
 		int type = queryRecord.getType();
 
 		// check for our TLD suffix
-		if (!nameString.endsWith("dssd.") && !nameString.endsWith("dssd")) {
+		if (!nameString.endsWith("fern.") && !nameString.endsWith("fern")) {
 			return true;
 		}
 
@@ -361,7 +325,7 @@ class InterGroupThread extends Thread {
 		}
 
 		// we've sanity-checked this record and it's okay for us to handle it!
-		// (it is an A record-query belonging to the .dssd. TLD)
+		// (it is an A record-query belonging to the .fern. TLD)
 		return false;
 	}
 
@@ -418,7 +382,7 @@ class InterGroupThread extends Thread {
 		return response.toWire();
 	}
 
-	void addRRset(Name name, Message response, RRset rrset, int section, int flags) {
+	void addRRset(org.xbill.DNS.Name name, Message response, RRset rrset, int section, int flags) {
 		for (int s = 1; s <= section; s++)
 			if (response.findRRset(name, rrset.getType(), s))
 				return;

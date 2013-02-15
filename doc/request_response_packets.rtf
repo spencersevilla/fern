@@ -9,4 +9,4 @@
 \
 We should definitely follow a DNS-esque model here, perhaps even reuse some packet types? A request packet should have the ENTIRE string, always (just-in-case we get a skip or cached match) as well as the best-fit "score" of the node it's sending it to. Request packets should also include a "count" of the number of times the request has been recursed, just for sanity/reference.\
 \
-Response packets should indicate if the response is exact or a "pointer" to another DNSGroup node. In addition, should indicate how many times the request was recursed, so we can add these two numbers up and get a sense of what's going on in the system.}
+Response packets should indicate if the response is exact or a "pointer" to another FERNGroup node. In addition, should indicate how many times the request was recursed, so we can add these two numbers up and get a sense of what's going on in the system.}

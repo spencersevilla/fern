@@ -1,17 +1,17 @@
-package com.spencersevilla.mdns;
+package com.spencersevilla.fern;
 
 import java.net.*;
 import java.util.Enumeration;
 
 public class Service {
-	public String name;
+	public Name name;
 	public int port;
 	public InetAddress addr;
 	
-	public Service(String n, int p, MultiDNS m) {
+	public Service(Name n, int p, InetAddress a) {
 		name = n;
 		port = p;
-		addr = m.getAddr();
+		addr = a;
 		
 		if (addr == null) {
 			addr = Service.generateAddress();
@@ -47,6 +47,6 @@ public class Service {
 	}
 
 	public String toString() {
-		return name;
+		return name.toString();
 	}
 }

@@ -1,5 +1,5 @@
-package com.spencersevilla.server_mdns;
-import com.spencersevilla.mdns.*;
+package com.spencersevilla.fern.server;
+import com.spencersevilla.fern.*;
 
 import org.apache.commons.daemon.*;
 import de.uniba.wiai.lspi.chord.service.PropertiesLoader;
@@ -9,12 +9,15 @@ import java.util.*;
 import java.net.InetAddress;
 
 public class MainClass implements Daemon, DaemonUserSignal {
-	protected MultiDNS mdns;
-	protected SwingGui gui;
+	protected FERNManager mdns;
+	// protected SwingGui gui;
 
 	private String conf;
 
 	public static void main(String[] args) throws Exception {
+
+		testName();
+		System.exit(0);
 
 		if (args.length > 1) {
 			System.out.println("usage: MainClass [conf_file]");
@@ -22,30 +25,21 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		}
 
 		MainClass m = new MainClass();
-		m.mdns = new MultiDNS();
-		m.gui = new SwingGui(m.mdns);
+		m.mdns = new FERNManager();
+		// m.gui = new SwingGui(m.mdns);
 
 		if (m.mdns == null) {
 			System.out.println("error: could not initialize mdns!");
 			System.exit(0);
 		}
 
-		if (args.length > 0) {
-			m.conf = args[0];
-		} else {
-			m.conf = "config/mdns.conf";
-		}
-
-		m.start();
-
-		// TESTING HERE!!!
-		// try {
-		// 	InetAddress dns_server = InetAddress.getByName("13.1.136.66");
-		// 	InetAddress addr = m.mdns.forwardRequest("www.google.com.", 0, dns_server, 53);
-		// 	System.out.println("request returned: " + addr);
-		// } catch (Exception e) {
-		// 	e.printStackTrace();
+		// if (args.length > 0) {
+		// 	m.conf = args[0];
+		// } else {
+		// 	m.conf = "config/mdns.conf";
 		// }
+
+		// m.start();
 	}
 
 	public MainClass() throws Exception {
@@ -54,7 +48,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 	// Java Daemon interface here! ============================================
 
 	public void init(DaemonContext context) throws DaemonInitException, Exception {
-		mdns = new MultiDNS();
+		mdns = new FERNManager();
 
 		if (mdns == null) {
 			throw new DaemonInitException("error: could not initialize mdns!");
@@ -114,7 +108,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		try {
 			while ((line = br.readLine()) != null) {
 				if (!line.equals("")) {
-					mdns.readCommandLine(line);					
+					CommandLineParser.readCommandLine(line, mdns);					
 				}
 	        }
 		} catch (IOException e) {
@@ -127,5 +121,22 @@ public class MainClass implements Daemon, DaemonUserSignal {
 			// do nothing special here
 		}
    		return;
+	}
+
+	public static void testName() {
+		Name a = new Name("a.b.c");
+		Name b = new Name("a.b.c");
+		Name c = new Name("c.d.e");
+		System.out.println("EQUALS: A.B.C == A.B.C ? " + a.equals(b));
+		a.fernify();
+		System.out.println("fernify a.b.c = " + a);
+		a.unfern();
+		System.out.println("unfern a.b.c.fern. = " + a);
+		System.out.println("getParent a.b.c. = " + a.getParent());
+		System.out.println("firstTerm a.b.c. = " + a.firstTerm());
+	}
+
+	public static void testObject() {
+		
 	}
 }

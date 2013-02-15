@@ -1,4 +1,4 @@
-package com.spencersevilla.mdns;
+package com.spencersevilla.fern;
 
 import de.uniba.wiai.lspi.chord.service.Key;
 
