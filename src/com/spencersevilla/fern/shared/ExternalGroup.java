@@ -23,6 +23,6 @@ public class ExternalGroup extends FERNObject {
 	}
 
 	public FERNObject forwardRequest(Request request) {
-		return InterGroupServer.resolveName(request, addr, port);
+		return InterGroupServer.resolveName(request, addr, 53);
 	}
 }
