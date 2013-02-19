@@ -16,9 +16,6 @@ public class MainClass implements Daemon, DaemonUserSignal {
 
 	public static void main(String[] args) throws Exception {
 
-		testName();
-		System.exit(0);
-
 		if (args.length > 1) {
 			System.out.println("usage: MainClass [conf_file]");
 			System.exit(0);
@@ -40,6 +37,13 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		// }
 
 		// m.start();
+		m.mdns.start();
+
+		String line = new String("GROUP TOP 2 ucsc.global join 128.114.59.75 5301");
+		CommandLineParser.readCommandLine(line, m.mdns);
+		Request r = new Request("ccrg-server.ucsc");
+		FERNObject o = m.mdns.resolveService(r);
+		System.out.println("RESOLVED: " + o);
 	}
 
 	public MainClass() throws Exception {

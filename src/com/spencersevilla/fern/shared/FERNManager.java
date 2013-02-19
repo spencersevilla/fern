@@ -168,7 +168,8 @@ public class FERNManager {
 		serviceList.remove(s);
 	}
 
-	protected FERNObject resolveService(Request request) {
+	public FERNObject resolveService(Request request) {
+		System.out.println("FERNManager resolving request: " + request);
 		// ORDER OF OPERATIONS:
 		// First, find a FERNObject which is OUR best-match. This can be
 		// a record we're offering, an external group (cached?), a group we're a
@@ -177,6 +178,7 @@ public class FERNManager {
 
 		// no matches? apparently we can't handle this request at all!
 		if (object == null) {
+			System.out.println("FERNManager: could not find ANY match for " + request);
 			return null;
 		}
 
