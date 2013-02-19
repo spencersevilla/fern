@@ -79,6 +79,7 @@ public class CommandLineParser {
 			}
 		} catch (RuntimeException e) {
 			System.out.println("CommandLineParser error: could not parse command line: " + commandline);
+			e.printStackTrace();
 		}
 	}
 }
