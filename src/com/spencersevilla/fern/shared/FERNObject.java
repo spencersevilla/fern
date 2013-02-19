@@ -94,6 +94,15 @@ public class FERNObject implements Serializable {
 		String[] names = servicename.getNameArray();
 		String[] groups = groupname.getNameArray();
 
+		System.out.println("names: ");
+		for (String s : names) {
+			System.out.println(s);
+		}
+		System.out.println("groups: ");
+		for (String s : groups) {
+			System.out.println(s);
+		}
+
 		int count = 0;
 		// the groupname may have a longer name than we specify
 		// but this cannot be the other way around!
@@ -144,7 +153,6 @@ public class FERNObject implements Serializable {
 	}
 
 	public static FERNObject findBestMatch(Request request, ArrayList<? extends FERNObject> array, FERNObject initial) {
-		System.out.println("FINDBESTMATCH: req = " + request);
 
 		FERNObject bestChoice = null;
 		int highScore = 0;
@@ -157,7 +165,6 @@ public class FERNObject implements Serializable {
 		int score;
 		for (FERNObject object : array) {
 			score = object.calculateScore(request);
-			System.out.println("FINDBESTMATCH: object = " + object + " and score = " + score);
 			if (score == highScore) {
 				System.out.println("FERNObject ERROR: for request " + request 
 					+ ", both " + bestChoice + " and " + object + " have score " + score);
