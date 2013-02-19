@@ -329,10 +329,6 @@ class InterGroupThread extends Thread {
 			return true;
 		}
 
-		if (type != Type.A) {
-			return true;
-		}
-
 		// we've sanity-checked this record and it's okay for us to handle it!
 		// (it is an A record-query belonging to the .fern. TLD)
 		return false;
