@@ -100,8 +100,10 @@ public class Name {
 
 		if (!name.endsWith("fern.")) {
 			name = name.concat("fern.");
-			length++;
-			nameArray.add(new String("fern"), 0);
+			String[] array = name.split("\\.");
+			Collections.reverse(Arrays.asList(array));
+			nameArray = array;
+			length = nameArray.length;
 		}
 	}
 
@@ -112,8 +114,10 @@ public class Name {
 
 		if (name.endsWith(".fern")) {
 			name = name.substring(0, name.length() - 5);
-			length--;
-			nameArray.remove(0);
+			String[] array = name.split("\\.");
+			Collections.reverse(Arrays.asList(array));
+			nameArray = array;
+			length = nameArray.length;
 		}
 	}
 
