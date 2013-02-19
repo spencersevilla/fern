@@ -212,21 +212,28 @@ class InterGroupThread extends Thread {
 
 	// this function borrows HEAVILY from jnamed.java's generateReply function!
     byte [] generateResponse() throws IOException {
-    	System.out.println("generateAnswer");
+    	System.out.println("generateResponse");
     	Message query = new Message(inpacket.getData());
     	Header header = query.getHeader();
     	int maxLength = 0;
 		int flags = 0;
 
     	// basic sanity checks
-    	if (header.getFlag(Flags.QR))
+    	if (header.getFlag(Flags.QR)) {
+    		System.err.println("IGS error: no QR flag?");
 			return null;
-		if (header.getRcode() != Rcode.NOERROR)
+		}
+		if (header.getRcode() != Rcode.NOERROR) {
+			System.err.println("IGS error: header.getRcode = " + header.getRcode());
 			return errorMessage(query, Rcode.FORMERR);
-		if (header.getOpcode() != Opcode.QUERY)
+		}
+		if (header.getOpcode() != Opcode.QUERY) {
+			System.err.println("IGS error: header.getOpcode() = " + header.getOpcode());
 			return errorMessage(query, Rcode.NOTIMP);
+		}
 
 		if (shouldForward(query)) {
+			System.err.println("IGS: queryRegularDNS()");
 			return queryRegularDNS(query);
 		}
 
