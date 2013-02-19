@@ -145,7 +145,7 @@ public class InterGroupServer implements Runnable {
 			return null;
 		}
 		if (header.getRcode() != Rcode.NOERROR) {
-			System.err.println("IGS error: header Rcode is " + header.getRcode());
+			System.out.println("IGS error: header Rcode is " + header.getRcode());
 			return null;
 		}
 		Record question = response.getQuestion();
@@ -212,6 +212,7 @@ class InterGroupThread extends Thread {
 
 	// this function borrows HEAVILY from jnamed.java's generateReply function!
     byte [] generateResponse() throws IOException {
+    	System.out.println("generateAnswer");
     	Message query = new Message(inpacket.getData());
     	Header header = query.getHeader();
     	int maxLength = 0;
@@ -274,6 +275,7 @@ class InterGroupThread extends Thread {
 	}
 
 	byte generateAnswer(Message query, Message response, int flags) {
+		System.out.println("generateAnswer");
 		Record queryRecord = query.getQuestion();
 		Name name = new Name(queryRecord.getName());
 		name.unfern();
