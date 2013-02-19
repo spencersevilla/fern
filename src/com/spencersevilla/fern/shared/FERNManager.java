@@ -81,6 +81,7 @@ public class FERNManager {
 		FERNGroup group = FERNGroup.createGroupFromArgs(this, name, gid, args);
 
 		if (group == null) {
+			System.out.println("FERNGroup error: could not create group!");
 			return null;
 		}
 

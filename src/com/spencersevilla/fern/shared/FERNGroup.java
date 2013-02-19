@@ -1,5 +1,5 @@
 package com.spencersevilla.fern;
-// import com.spencersevilla.fern.groups.*;
+import com.spencersevilla.fern.groups.*;
 
 import java.util.*;
 import java.net.InetAddress;
@@ -79,15 +79,15 @@ public abstract class FERNGroup extends FERNObject {
 	public static final FERNGroup createGroupFromArgs(FERNManager m, Name n, int gid, ArrayList<String> args) {
 		FERNGroup group = null;
 
-		// if (gid == FloodGroup.id) {
+		if (gid == ChordGroup.id) {
+			group = new ChordGroup(m, n, args);
+		} else if (gid == ServerGroup.id) {
+			group = ServerGroup.createGroupFromArgs(m, n, args);
+		// } else 	if (gid == FloodGroup.id) {
 		// 	group = new FloodGroup(m, n, args);
-		// } else if (gid == ChordGroup.id) {
-		// 	group = new ChordGroup(m, n, args);
-		// } else if (gid == ServerGroup.id) {
-		// 	group = ServerGroup.createGroupFromArgs(m, n, args);
-		// } else {
-		// 	group = null;
-		// }
+		} else {
+			group = null;
+		}
 		
 		return group;
 	}
