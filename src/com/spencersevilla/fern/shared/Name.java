@@ -100,6 +100,8 @@ public class Name {
 
 		if (!name.endsWith("fern.")) {
 			name = name.concat("fern.");
+			length++;
+			nameArray.add(new String("fern"), 0);
 		}
 	}
 
@@ -110,6 +112,8 @@ public class Name {
 
 		if (name.endsWith(".fern")) {
 			name = name.substring(0, name.length() - 5);
+			length--;
+			nameArray.remove(0);
 		}
 	}
 

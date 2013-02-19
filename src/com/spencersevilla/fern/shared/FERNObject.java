@@ -94,15 +94,6 @@ public class FERNObject implements Serializable {
 		String[] names = servicename.getNameArray();
 		String[] groups = groupname.getNameArray();
 
-		System.out.println("names: ");
-		for (String s : names) {
-			System.out.println(s);
-		}
-		System.out.println("groups: ");
-		for (String s : groups) {
-			System.out.println(s);
-		}
-
 		int count = 0;
 		// the groupname may have a longer name than we specify
 		// but this cannot be the other way around!
