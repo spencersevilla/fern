@@ -76,7 +76,13 @@ public class Name {
 
 	public org.xbill.DNS.Name toDNSName() {
 		try {
-			return new org.xbill.DNS.Name(name.toString());
+			String s = name;
+
+			if (!s.endsWith(".")) {
+				s = s.concat(".");
+			}
+			return new org.xbill.DNS.Name(s);
+			
 		} catch (TextParseException e) {
 			System.err.println("BIG ERROR: could not generate xbill.DNS.Name!");
 			return null;
