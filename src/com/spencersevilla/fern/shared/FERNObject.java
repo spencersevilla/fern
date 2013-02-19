@@ -26,6 +26,11 @@ public class FERNObject implements Serializable {
 		record = r;
 	}
 
+	// for interface display
+	public final String toString() {
+		return name.toString();
+	}
+	
 	// this is an awkward function that appends a servicename to
 	// the end of a FERNGroup name to create a fully-qualified FERN record.
 	public FERNObject(Service service, FERNGroup group) {

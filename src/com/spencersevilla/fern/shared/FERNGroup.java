@@ -164,11 +164,6 @@ public abstract class FERNGroup extends FERNObject {
 
 		return new Name(querygroups[groups.length]);
 	}
-
-	// for interface display
-	public final String toString() {
-		return name.toString();
-	}
 	
 	public final FERNObject forwardRequest(Request request) {
 		FERNObject o = resolveName(request);
