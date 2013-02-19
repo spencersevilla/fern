@@ -39,6 +39,7 @@ public class CommandLineParser {
 					FERNGroup group = m.createGroup(group_name, gid, args);
 
 					if (group == null) {
+						System.out.println("CommandLineParser: could not create group!");
 						throw new RuntimeException();
 					}
 					
@@ -51,6 +52,7 @@ public class CommandLineParser {
 					FERNGroup parent = m.findGroupByName(parent_name);
 
 					if (parent == null) {
+						System.out.println("CommandLineParser: could not find parent!");
 						throw new RuntimeException();
 					}
 
@@ -65,6 +67,7 @@ public class CommandLineParser {
 					FERNGroup group = m.createSubGroup(parent, subgroup_name, gid, args);
 
 					if (group == null) {
+						System.out.println("CommandLineParser: could not create group!");
 						throw new RuntimeException();
 					}
 
