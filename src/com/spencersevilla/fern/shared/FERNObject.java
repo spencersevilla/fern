@@ -82,11 +82,11 @@ public class FERNObject implements Serializable {
 		return FERNObject.calculateScore(request, name);		
 	}
 
-	protected final int calculateScore(Request request) {
+	public final int calculateScore(Request request) {
 		return FERNObject.calculateScore(request.name, name);		
 	}
 
-	protected static final int calculateScore(Name servicename, Name groupname) {
+	public static final int calculateScore(Name servicename, Name groupname) {
 		if (servicename == null || groupname == null) {
 			return 0;
 		}
@@ -144,6 +144,8 @@ public class FERNObject implements Serializable {
 	}
 
 	public static FERNObject findBestMatch(Request request, ArrayList<? extends FERNObject> array, FERNObject initial) {
+		System.out.println("FINDBESTMATCH: req = " + request);
+
 		FERNObject bestChoice = null;
 		int highScore = 0;
 
@@ -155,6 +157,7 @@ public class FERNObject implements Serializable {
 		int score;
 		for (FERNObject object : array) {
 			score = object.calculateScore(request);
+			System.out.println("FINDBESTMATCH: object = " + object + " and score = " + score);
 			if (score == highScore) {
 				System.out.println("FERNObject ERROR: for request " + request 
 					+ ", both " + bestChoice + " and " + object + " have score " + score);

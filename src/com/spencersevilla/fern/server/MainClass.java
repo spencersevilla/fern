@@ -16,6 +16,8 @@ public class MainClass implements Daemon, DaemonUserSignal {
 
 	public static void main(String[] args) throws Exception {
 
+		testScore();
+
 		if (args.length > 1) {
 			System.out.println("usage: MainClass [conf_file]");
 			System.exit(0);
@@ -140,7 +142,20 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		System.out.println("firstTerm a.b.c. = " + a.firstTerm());
 	}
 
-	public static void testObject() {
-		
+	public static void testScore() {
+		System.out.println("SCORE TESTER::");
+		Request req = new Request("ccrg-server.ucsc");
+		Name gname = new Name("global");
+		FERNObject obj = new FERNObject(gname, null);
+
+		Name gname2 = new Name("ucsc.global");
+		FERNObject obj2 = new FERNObject(gname2, null);
+
+		ArrayList<FERNObject> ar = new ArrayList<FERNObject>();
+		ar.add(obj);
+		ar.add(obj2);
+
+		FERNObject o = FERNObject.findBestMatch(req, ar, null);
+		System.out.println("object: " + o);
 	}
 }
