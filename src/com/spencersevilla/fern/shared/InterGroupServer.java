@@ -280,7 +280,7 @@ class InterGroupThread extends Thread {
 
 		byte rcode = generateAnswer(query, response, flags);
 
-		if (rcode != Rcode.NOERROR && rcode != Rcode.NXDOMAIN) {
+		if (rcode != Rcode.NOERROR) {
 			return errorMessage(query, rcode);
 		}
 
