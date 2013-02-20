@@ -158,6 +158,11 @@ public abstract class FERNGroup extends FERNObject {
 	public final FERNObject forwardRequest(Request request) {
 		FERNObject o = resolveName(request);
 
+		// we got all the way to the end, but the record doesn't exist!
+		if (o == null) {
+			return null;
+		}
+
 		if (o.isExactMatch(request)) {
 			return o;
 		}
