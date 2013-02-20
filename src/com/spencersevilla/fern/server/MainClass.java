@@ -43,10 +43,14 @@ public class MainClass implements Daemon, DaemonUserSignal {
 
 		String line = new String("GROUP TOP 2 ucsc.global join 128.114.59.75 5301");
 		CommandLineParser.readCommandLine(line, m.mdns);
-		Request r = new Request("ccrg-server.ucsc");
+		Request r = new Request("xxx.global");
 		FERNObject o = m.mdns.resolveService(r);
-		System.out.println("RESOLVED: " + o.name);
-		o.printFull();
+		if (o != null) {
+			System.out.println("RESOLVED REQUEST: " + r);
+			o.printFull();
+		} else {
+			System.out.println("COULD NOT RESOLVE REQUEST: " + r);
+		}
 	}
 
 	public MainClass() throws Exception {
