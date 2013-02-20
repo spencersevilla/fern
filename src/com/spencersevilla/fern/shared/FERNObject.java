@@ -39,10 +39,16 @@ public class FERNObject implements Serializable {
 	}
 
 	public void addRecord(FERNRecord r) {
-		if (!r.name.equals(name)) {
-			System.err.println("FERNObject error: cannot add record");
+		if (r == null) {
+			System.err.println("FERNObject error: null record!");
 			return;
 		}
+
+		if (!r.name.equals(name)) {
+			System.err.println("FERNObject error: cannot add record!");
+			return;
+		}
+
 		recordSet.add(r);
 	}
 	
@@ -52,7 +58,8 @@ public class FERNObject implements Serializable {
 		name = service.name.concatenate(group.name);
 
 		byte[] rdata = service.addr.getAddress();
-		addRecord(new FERNRecord(name, Type.A, DClass.IN, 0, rdata));
+		FERNRecord r = new FERNRecord(name, Type.A, DClass.IN, 0, rdata);
+		addRecord(r);
 	}
 
 	// ideal for overwriting!
