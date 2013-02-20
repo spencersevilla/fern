@@ -153,14 +153,21 @@ public class InterGroupServer implements Runnable {
 	private static FERNObject parseResponse(Message response, Request request) {
 		Header header = response.getHeader();
 
-		if (!header.getFlag(Flags.QR)) {
-			System.err.println("IGS error: response not a QR");
+		if (header.getRcode() == Rcode.NXDOMAIN) {
+			// no error-alert here, this is a standard operation.
 			return null;
 		}
+
 		if (header.getRcode() != Rcode.NOERROR) {
 			System.out.println("IGS error: header Rcode is " + header.getRcode());
 			return null;
 		}
+
+		if (!header.getFlag(Flags.QR)) {
+			System.err.println("IGS error: response not a QR");
+			return null;
+		}
+
 		org.xbill.DNS.Record question = response.getQuestion();
 
 		// sanity check on question here...
