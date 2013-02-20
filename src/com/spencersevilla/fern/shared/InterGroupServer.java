@@ -8,7 +8,16 @@ package com.spencersevilla.fern;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import org.xbill.DNS.*;
+
+import org.xbill.DNS.Message;
+import org.xbill.DNS.Header;
+import org.xbill.DNS.Section;
+import org.xbill.DNS.Rcode;
+import org.xbill.DNS.RRset;
+import org.xbill.DNS.Flags;
+import org.xbill.DNS.ExtendedFlags;
+import org.xbill.DNS.OPTRecord;
+import org.xbill.DNS.Opcode;
 
 public class InterGroupServer implements Runnable {
 
@@ -119,7 +128,6 @@ public class InterGroupServer implements Runnable {
 				System.out.println("IGS: " + addr + ":" + port + " returned (null) for request: " + request);
 			} else {
 				System.out.println("IGS: " + addr + ":" + port + " returned answer for request: " + request);
-				result.printFull();
 			}
 
 			return result;
@@ -137,7 +145,7 @@ public class InterGroupServer implements Runnable {
 			name.fernify();
 			org.xbill.DNS.Name n = name.toDNSName();
 
-			Record query = Record.newRecord(n, Type.ANY, DClass.IN);
+			org.xbill.DNS.Record query = org.xbill.DNS.Record.newRecord(n, Type.ANY, DClass.IN);
 			Message message = Message.newQuery(query);
 			return message.toWire();
 	}
@@ -153,14 +161,14 @@ public class InterGroupServer implements Runnable {
 			System.out.println("IGS error: header Rcode is " + header.getRcode());
 			return null;
 		}
-		Record question = response.getQuestion();
+		org.xbill.DNS.Record question = response.getQuestion();
 
 		// sanity check on question here...
 
-		Record[] records = response.getSectionArray(Section.ANSWER);
+		org.xbill.DNS.Record[] records = response.getSectionArray(Section.ANSWER);
 
 		// simplest alg: just return the first valid record...
-		Record r = records[0];
+		org.xbill.DNS.Record r = records[0];
 		Name n = new Name(r.getName());
 		FERNObject object = new FERNObject(n);
 		object.addRecord(new FERNRecord(r));
@@ -240,7 +248,7 @@ class InterGroupThread extends Thread {
 		}
 
 		// parse out the question from the record
-		Record queryRecord = query.getQuestion();
+		org.xbill.DNS.Record queryRecord = query.getQuestion();
 		System.out.println("IGS: received query for " + queryRecord.getName());
 
 		OPTRecord queryOPT = query.getOPT();
@@ -285,7 +293,7 @@ class InterGroupThread extends Thread {
 
 	byte generateAnswer(Message query, Message response, int flags) {
 		System.out.println("generateAnswer");
-		Record queryRecord = query.getQuestion();
+		org.xbill.DNS.Record queryRecord = query.getQuestion();
 		Name name = new Name(queryRecord.getName());
 		name.unfern();
 		Request request = new Request(name);
@@ -309,7 +317,7 @@ class InterGroupThread extends Thread {
 		}
 
 		for (FERNRecord fern_rec : object.getRecordSet()) {
-			Record rec = fern_rec.toDNSRecord();
+			org.xbill.DNS.Record rec = fern_rec.toDNSRecord();
 			RRset rset = new RRset(rec);
 			addRRset(queryRecord.getName(), response, rset, Section.ANSWER, flags);
 		}
@@ -323,7 +331,7 @@ class InterGroupThread extends Thread {
 	}
 
 	boolean shouldForward(Message query) {
-		Record queryRecord = query.getQuestion();
+		org.xbill.DNS.Record queryRecord = query.getQuestion();
 
 		if (queryRecord == null) {
 			return true;
@@ -384,7 +392,7 @@ class InterGroupThread extends Thread {
 					 query.getQuestion());
 	}
 
-	byte [] buildErrorMessage(Header header, int rcode, Record question) {
+	byte [] buildErrorMessage(Header header, int rcode, org.xbill.DNS.Record question) {
 		Message response = new Message();
 		response.setHeader(header);
 		for (int i = 0; i < 4; i++)
@@ -402,7 +410,7 @@ class InterGroupThread extends Thread {
 		if ((flags & FLAG_SIGONLY) == 0) {
 			Iterator it = rrset.rrs();
 			while (it.hasNext()) {
-				Record r = (Record) it.next();
+				org.xbill.DNS.Record r = (org.xbill.DNS.Record) it.next();
 				if (r.getName().isWild() && !name.isWild())
 					r = r.withName(name);
 				response.addRecord(r, section);
@@ -411,7 +419,7 @@ class InterGroupThread extends Thread {
 		if ((flags & (FLAG_SIGONLY | FLAG_DNSSECOK)) != 0) {
 			Iterator it = rrset.sigs();
 			while (it.hasNext()) {
-				Record r = (Record) it.next();
+				org.xbill.DNS.Record r = (org.xbill.DNS.Record) it.next();
 				if (r.getName().isWild() && !name.isWild())
 					r = r.withName(name);
 				response.addRecord(r, section);
