@@ -38,6 +38,14 @@ public class FERNObject implements Serializable {
 		return name.toString();
 	}
 
+	public final void printFull() {
+		System.out.println("FERNObject Name: "+ name);
+		System.out.println("NAME \t\t\tTYPE \tCLASS \tTTL \tDATA");
+		for (FERNRecord r : recordSet) {
+			System.out.println(r.toString());
+		}
+	}
+
 	public void addRecord(FERNRecord r) {
 		if (r == null) {
 			System.err.println("FERNObject error: null record!");

@@ -115,7 +115,12 @@ public class InterGroupServer implements Runnable {
 			Message m = new Message(recpack.getData());
 			FERNObject result = parseResponse(m, request);
 
-			System.out.println("IGS: " + addr + ":" + port + " returned " + result + " for " + request);
+			if (result == null) {
+				System.out.println("IGS: " + addr + ":" + port + " returned (null) for request: " + request);
+			} else {
+				System.out.println("IGS: " + addr + ":" + port + " returned answer for request: " + request);
+				result.printFull();
+			}
 
 			return result;
 		} catch (SocketTimeoutException e) {

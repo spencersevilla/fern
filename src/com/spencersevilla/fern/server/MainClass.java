@@ -16,7 +16,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 
 	public static void main(String[] args) throws Exception {
 
-		testScore();
+		// testScore();
 
 		if (args.length > 1) {
 			System.out.println("usage: MainClass [conf_file]");
