@@ -170,7 +170,7 @@ public class FERNObject implements Serializable {
 		int score;
 		for (FERNObject object : array) {
 			score = object.calculateScore(request);
-			if (score == highScore) {
+			if (score == highScore && score != 0) {
 				System.out.println("FERNObject ERROR: for request " + request 
 					+ ", both " + bestChoice + " and " + object + " have score " + score);
 			} else if (score > highScore) {
