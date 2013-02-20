@@ -4,8 +4,6 @@ import org.xbill.DNS.Record;
 import org.xbill.DNS.Message;
 import org.xbill.DNS.Section;
 import org.xbill.DNS.Rcode;
-import org.xbill.DNS.Type;
-import org.xbill.DNS.DClass;
 import org.xbill.DNS.Header;
 import org.xbill.DNS.Flags;
 

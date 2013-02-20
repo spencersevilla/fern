@@ -2,18 +2,25 @@ package com.spencersevilla.fern;
 
 import java.util.*;
 import java.io.*;
-import org.xbill.DNS.Record;
-import org.xbill.DNS.Type;
-import org.xbill.DNS.DClass;
 
 public class FERNObject implements Serializable {
 	public Name name;
-	protected Record record;
+	private ArrayList<FERNRecord> recordSet;
 
-	public FERNObject(Name n, Record r) {
+	public FERNObject(Name n) {
 		name = n;
-		record = r;
+		recordSet = new ArrayList<FERNRecord>();
 	}
+
+	public ArrayList<FERNRecord> getRecordSet() {
+		return recordSet;
+	}
+
+	// public FERNObject(Name n, Record r) {
+	// 	name = n;
+	// 	record = r;
+	// 	recordSet = new ArrayList<FERNRecord>();
+	// }
 
 	// public FERNObject(Name n) {
 	// 	name = n;
@@ -21,14 +28,22 @@ public class FERNObject implements Serializable {
 	// 	System.out.println ("WARNING: FERNObject " + n + " created without a record...");
 	// }
 
-	public FERNObject(Record r) {
-		name = new Name(r.getName());
-		record = r;
-	}
+	// public FERNObject(Record r) {
+	// 	name = new Name(r.getName());
+	// 	record = r;
+	// }
 
 	// for interface display
 	public final String toString() {
 		return name.toString();
+	}
+
+	public void addRecord(FERNRecord r) {
+		if (!r.name.equals(name)) {
+			System.err.println("FERNObject error: cannot add record");
+			return;
+		}
+		recordSet.add(r);
 	}
 	
 	// this is an awkward function that appends a servicename to
@@ -37,9 +52,10 @@ public class FERNObject implements Serializable {
 		name = service.name.concatenate(group.name);
 
 		byte[] rdata = service.addr.getAddress();
-		record = Record.newRecord(name.toDNSName(), Type.A, DClass.IN, 0, rdata);
+		addRecord(new FERNRecord(name, Type.A, DClass.IN, 0, rdata));
 	}
 
+	// ideal for overwriting!
 	public FERNObject forwardRequest(Request request) {
 		System.out.println("ERROR: class FERNObject cannot forward requests!!!");
 		return null;

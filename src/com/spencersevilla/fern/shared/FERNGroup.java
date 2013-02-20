@@ -4,10 +4,6 @@ import com.spencersevilla.fern.groups.*;
 import java.util.*;
 import java.net.InetAddress;
 
-import org.xbill.DNS.Record;
-import org.xbill.DNS.Type;
-import org.xbill.DNS.DClass;
-
 public abstract class FERNGroup extends FERNObject {
 
 	public static final Name PARENT_NAME = new Name("PARENT");
@@ -20,27 +16,21 @@ public abstract class FERNGroup extends FERNObject {
 // ======================================================================================
 
 	public FERNGroup(FERNManager m, Name n) {
-		super(n, FERNGroup.generateRecord(m,n));
-		mdns = m;
-		recursive = false;
-		parent = null;
-	}
+		super(n);
+		addRecord(FERNGroup.generateRecord(m,n));
 
-	// if you really care about the record returned, specify it yourself!
-	public FERNGroup(FERNManager m, Name n, Record r) {
-		super(n, r);
 		mdns = m;
 		recursive = false;
 		parent = null;
 	}
 	
-	public static Record generateRecord(FERNManager m, Name n) {
+	public static FERNRecord generateRecord(FERNManager m, Name n) {
 		InetAddress addr = m.getAddr();
 		if (addr == null) {
 			addr = Service.generateAddress();
 		}
 		byte[] rdata = addr.getAddress();
-		return Record.newRecord(n.toDNSName(), Type.A, DClass.IN, 0, rdata);	
+		return new FERNRecord(n, Type.A, DClass.IN, 0, rdata);	
 	}
 
 	// This function identifies every FERNGroup uniquely using its fullname!

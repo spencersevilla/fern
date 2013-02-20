@@ -146,10 +146,10 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		System.out.println("SCORE TESTER::");
 		Request req = new Request("ccrg-server.ucsc");
 		Name gname = new Name("global");
-		FERNObject obj = new FERNObject(gname, null);
+		FERNObject obj = new FERNObject(gname);
 
 		Name gname2 = new Name("ucsc.global");
-		FERNObject obj2 = new FERNObject(gname2, null);
+		FERNObject obj2 = new FERNObject(gname2);
 
 		ArrayList<FERNObject> ar = new ArrayList<FERNObject>();
 		ar.add(obj);

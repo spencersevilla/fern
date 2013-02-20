@@ -113,7 +113,7 @@ public class InterGroupServer implements Runnable {
 			sock.receive(recpack);
 
 			Message m = new Message(recpack.getData());
-			FERNObject result = parseResponse(m);
+			FERNObject result = parseResponse(m, request);
 
 			System.out.println("IGS: " + addr + ":" + port + " returned " + result + " for " + request);
 
@@ -137,7 +137,7 @@ public class InterGroupServer implements Runnable {
 			return message.toWire();
 	}
 
-	private static FERNObject parseResponse(Message response) {
+	private static FERNObject parseResponse(Message response, Request request) {
 		Header header = response.getHeader();
 
 		if (!header.getFlag(Flags.QR)) {
@@ -155,20 +155,17 @@ public class InterGroupServer implements Runnable {
 		Record[] records = response.getSectionArray(Section.ANSWER);
 
 		// simplest alg: just return the first valid record...
-		Record answer = null;
-		FERNObject object = null;
-		for(int i = 0; i < records.length; i++) {
-			answer = records[i];
+		Record r = records[0];
+		Name n = new Name(r.getName());
+		FERNObject object = new FERNObject(n);
+		object.addRecord(new FERNRecord(r));
 
-			object = new FERNObject(answer);
-			if (object == null) {
-				continue;
-			}
-
-			return object;
+		for(int i = 1; i < records.length; i++) {
+			r = records[i];
+			object.addRecord(new FERNRecord(r));
 		}
 
-		return null;
+		return object;
 	}
 }
 
@@ -302,9 +299,15 @@ class InterGroupThread extends Thread {
 			return Rcode.NXDOMAIN;
 		}
 
-		Record rec = object.record;
-		RRset r = new RRset(rec);
-		addRRset(queryRecord.getName(), response, r, Section.ANSWER, flags);
+		if (object.getRecordSet().isEmpty()) {
+			return Rcode.NXDOMAIN;
+		}
+
+		for (FERNRecord fern_rec : object.getRecordSet()) {
+			Record rec = fern_rec.toDNSRecord();
+			RRset rset = new RRset(rec);
+			addRRset(queryRecord.getName(), response, rset, Section.ANSWER, flags);
+		}
 
 		return Rcode.NOERROR;
 
