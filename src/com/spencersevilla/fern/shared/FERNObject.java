@@ -16,23 +16,6 @@ public class FERNObject implements Serializable {
 		return recordSet;
 	}
 
-	// public FERNObject(Name n, Record r) {
-	// 	name = n;
-	// 	record = r;
-	// 	recordSet = new ArrayList<FERNRecord>();
-	// }
-
-	// public FERNObject(Name n) {
-	// 	name = n;
-	// 	record = null;
-	// 	System.out.println ("WARNING: FERNObject " + n + " created without a record...");
-	// }
-
-	// public FERNObject(Record r) {
-	// 	name = new Name(r.getName());
-	// 	record = r;
-	// }
-
 	// for interface display
 	public final String toString() {
 		return name.toString();

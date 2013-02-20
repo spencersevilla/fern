@@ -45,7 +45,8 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		CommandLineParser.readCommandLine(line, m.mdns);
 		Request r = new Request("ccrg-server.ucsc");
 		FERNObject o = m.mdns.resolveService(r);
-		System.out.println("RESOLVED: " + o);
+		System.out.println("RESOLVED: " + o.name);
+		o.printFull();
 	}
 
 	public MainClass() throws Exception {
