@@ -3,7 +3,7 @@ package com.spencersevilla.fern;
 import java.util.*;
 import java.io.*;
 
-public class FERNRecord {
+public class Record {
 	protected Name name;
 	protected int type, dclass;
 	protected long ttl;
@@ -11,7 +11,7 @@ public class FERNRecord {
 
 	private final String TAB = new String("\t");
 
-	public FERNRecord(org.xbill.DNS.Record r) {
+	public Record(org.xbill.DNS.Record r) {
 		name = new Name(r.getName());
 		type = r.getType();
 		dclass = r.getDClass();
@@ -19,7 +19,7 @@ public class FERNRecord {
 		data = r.rdataToWireCanonical();
 	}
 
-	public FERNRecord(Name n, int t, int d, int tt, byte[] dat) {
+	public Record(Name n, int t, int d, int tt, byte[] dat) {
 		name = n;
 		type = t;
 		dclass = d;

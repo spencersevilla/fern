@@ -5,14 +5,14 @@ import java.io.*;
 
 public class FERNObject implements Serializable {
 	public Name name;
-	private ArrayList<FERNRecord> recordSet;
+	private ArrayList<Record> recordSet;
 
 	public FERNObject(Name n) {
 		name = n;
-		recordSet = new ArrayList<FERNRecord>();
+		recordSet = new ArrayList<Record>();
 	}
 
-	public ArrayList<FERNRecord> getRecordSet() {
+	public ArrayList<Record> getRecordSet() {
 		return recordSet;
 	}
 
@@ -24,12 +24,12 @@ public class FERNObject implements Serializable {
 	public final void printFull() {
 		System.out.println("FERNObject Name: "+ name);
 		System.out.println("NAME \t\t\tTYPE \tCLASS \tTTL \tDATA");
-		for (FERNRecord r : recordSet) {
+		for (Record r : recordSet) {
 			System.out.println(r.toString());
 		}
 	}
 
-	public void addRecord(FERNRecord r) {
+	public void addRecord(Record r) {
 		if (r == null) {
 			System.err.println("FERNObject error: null record!");
 			return;
@@ -49,7 +49,7 @@ public class FERNObject implements Serializable {
 		this(service.name.concatenate(group.name));
 
 		byte[] rdata = service.addr.getAddress();
-		FERNRecord r = new FERNRecord(name, Type.A, DClass.IN, 0, rdata);
+		Record r = new Record(name, Type.A, DClass.IN, 0, rdata);
 		addRecord(r);
 	}
 

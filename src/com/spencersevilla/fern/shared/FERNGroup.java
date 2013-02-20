@@ -24,13 +24,13 @@ public abstract class FERNGroup extends FERNObject {
 		parent = null;
 	}
 	
-	public static FERNRecord generateRecord(FERNManager m, Name n) {
+	public static Record generateRecord(FERNManager m, Name n) {
 		InetAddress addr = m.getAddr();
 		if (addr == null) {
 			addr = Service.generateAddress();
 		}
 		byte[] rdata = addr.getAddress();
-		return new FERNRecord(n, Type.A, DClass.IN, 0, rdata);	
+		return new Record(n, Type.A, DClass.IN, 0, rdata);	
 	}
 
 	// This function identifies every FERNGroup uniquely using its fullname!

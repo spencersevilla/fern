@@ -171,11 +171,11 @@ public class InterGroupServer implements Runnable {
 		org.xbill.DNS.Record r = records[0];
 		Name n = new Name(r.getName());
 		FERNObject object = new FERNObject(n);
-		object.addRecord(new FERNRecord(r));
+		object.addRecord(new Record(r));
 
 		for(int i = 1; i < records.length; i++) {
 			r = records[i];
-			object.addRecord(new FERNRecord(r));
+			object.addRecord(new Record(r));
 		}
 
 		return object;
@@ -316,7 +316,7 @@ class InterGroupThread extends Thread {
 			return Rcode.NXDOMAIN;
 		}
 
-		for (FERNRecord fern_rec : object.getRecordSet()) {
+		for (Record fern_rec : object.getRecordSet()) {
 			org.xbill.DNS.Record rec = fern_rec.toDNSRecord();
 			RRset rset = new RRset(rec);
 			addRRset(queryRecord.getName(), response, rset, Section.ANSWER, flags);

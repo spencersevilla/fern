@@ -14,9 +14,9 @@ public class ExternalGroup extends FERNObject {
 		port = p;
 	}
 
-	public static FERNRecord generateRecord(Name n, InetAddress a) {
+	public static Record generateRecord(Name n, InetAddress a) {
 		byte[] rdata = a.getAddress();
-		return new FERNRecord(n, Type.A, DClass.IN, 0, rdata);
+		return new Record(n, Type.A, DClass.IN, 0, rdata);
 	}
 
 	public FERNObject forwardRequest(Request request) {
