@@ -93,6 +93,12 @@ public class Name {
 		}
 	}
 
+	public void terminate() {
+		if (!name.endsWith(".")) {
+			name = name.concat(".");
+		}
+	}
+
 	public Name(org.xbill.DNS.Name n) {
 		this(n.toString());
 	}

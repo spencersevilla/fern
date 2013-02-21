@@ -9,6 +9,7 @@ public class FERNObject implements Serializable {
 	private ArrayList<Record> recordSet;
 
 	public FERNObject(Name n) {
+		n.terminate();
 		name = n;
 		recordSet = new ArrayList<Record>();
 	}
