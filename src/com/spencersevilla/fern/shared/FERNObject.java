@@ -2,6 +2,7 @@ package com.spencersevilla.fern;
 
 import java.util.*;
 import java.io.*;
+import java.net.InetAddress;
 
 public class FERNObject implements Serializable {
 	public Name name;
@@ -55,7 +56,19 @@ public class FERNObject implements Serializable {
 
 	// ideal for overwriting!
 	public Response forwardRequest(Request request) {
-		System.out.println("ERROR: class FERNObject cannot forward requests!!!");
+	// 	return InterGroupServer.resolveName(request, addr, 53);
+		InetAddress a;
+		for (Record r : recordSet) {
+			if (r.type == Type.A) {
+				try {
+					a = InetAddress.getByAddress(r.data);
+					return InterGroupServer.resolveName(request, a, 53);				
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		System.err.println("ERROR: forwardRequest called on a FERNObject with no valid A-record!!!");
 		return null;
 	}
 

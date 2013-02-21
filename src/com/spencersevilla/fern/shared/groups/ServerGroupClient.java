@@ -6,7 +6,7 @@ import java.net.*;
 import java.util.*;
 
 public class ServerGroupClient extends ServerGroup implements Runnable {
-	private ExternalGroup server;
+	private FERNObject server;
 
 	public ServerGroupClient(FERNManager m, Name n, InetAddress a, int p) {
 			super(m, n, a, p);
@@ -14,7 +14,9 @@ public class ServerGroupClient extends ServerGroup implements Runnable {
 
 	public void start() {
 		System.out.println("SGClient " + name + ": starting-up");
-		server = new ExternalGroup(name, addr, port);
+		server = new FERNObject(name);
+		Record r = new Record(name, Type.A, DClass.IN, 0, addr.getAddress());
+		server.addRecord(r);
 		return;
 	}
 
@@ -29,7 +31,7 @@ public class ServerGroupClient extends ServerGroup implements Runnable {
 
 	public void registerObject(FERNObject object) {
 		try {
-			Socket client = new Socket(server.addr, server.port);
+			Socket client = new Socket(addr, port);
 
 			// ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 			ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
@@ -52,7 +54,7 @@ public class ServerGroupClient extends ServerGroup implements Runnable {
 
 	public void removeObject(FERNObject object) {
 		try {
-			Socket client = new Socket(server.addr, server.port);
+			Socket client = new Socket(addr, port);
 
 			// ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 			ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
