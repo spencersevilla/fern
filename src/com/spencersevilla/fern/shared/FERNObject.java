@@ -54,7 +54,7 @@ public class FERNObject implements Serializable {
 	}
 
 	// ideal for overwriting!
-	public FERNObject forwardRequest(Request request) {
+	public Response forwardRequest(Request request) {
 		System.out.println("ERROR: class FERNObject cannot forward requests!!!");
 		return null;
 	}

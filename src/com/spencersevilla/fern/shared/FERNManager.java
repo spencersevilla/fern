@@ -168,7 +168,7 @@ public class FERNManager {
 		serviceList.remove(s);
 	}
 
-	public FERNObject resolveService(Request request) {
+	public Response resolveService(Request request) {
 		System.out.println("FERNManager resolving request: " + request);
 		// ORDER OF OPERATIONS:
 		// First, find a FERNObject which is OUR best-match. This can be
@@ -184,13 +184,18 @@ public class FERNManager {
 
 		// this object fulfills the request, so we're done: return it!
 		if (object.isExactMatch(request)) {
-			return object;
+			Response r = new Response(object);
+			r.setRequest(request);
+			return r;
 		}
 
-		// our best-match isn't good enough, so let's use it as the next-step
-		// in our resolution! note that this function will eventually completely
-		// fulfill the request upon returning.
-		return object.forwardRequest(request);
+		// our best-match isn't exact, so use it to keep forwarding.
+		// note that when this response returns, we *add* our entry
+		// to it in order to facilitate caching! Note that we also
+		// still need to READ this response for other cached entries :-)
+		Response r = object.forwardRequest(request);
+		r.addOtherEntry(object);
+		return r;
 	}
 
 	// PRIVATE METHODS HERE ===================================================

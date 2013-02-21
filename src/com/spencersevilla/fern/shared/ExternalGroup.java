@@ -19,7 +19,7 @@ public class ExternalGroup extends FERNObject {
 		return new Record(n, Type.A, DClass.IN, 0, rdata);
 	}
 
-	public FERNObject forwardRequest(Request request) {
+	public Response forwardRequest(Request request) {
 		return InterGroupServer.resolveName(request, addr, 53);
 	}
 }

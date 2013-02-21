@@ -34,8 +34,12 @@ public class Record {
 	private String dataString() {
 		if (type == Type.A) {
 			return org.xbill.DNS.Address.toDottedQuad(data);
+		} else if (type == Type.NS) {
+			return new String(data);
+		} else if (type == Type.TXT) {
+			return new String(data);
 		} else {
-			return null;
+			return new String("FERN DOES NOT SUPPORT THIS RECORD TYPE YET");
 		}
 	}
 

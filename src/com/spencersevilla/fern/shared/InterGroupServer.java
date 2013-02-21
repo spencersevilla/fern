@@ -99,7 +99,7 @@ public class InterGroupServer implements Runnable {
         }
 	}
 	
-	public static FERNObject resolveName(Request request, InetAddress addr, int port) {
+	public static Response resolveName(Request request, InetAddress addr, int port) {
 		try {
 			byte[] sendbuf = generateRequest(request);
 			if (sendbuf == null) {
@@ -122,7 +122,7 @@ public class InterGroupServer implements Runnable {
 			sock.receive(recpack);
 
 			Message m = new Message(recpack.getData());
-			FERNObject result = parseResponse(m, request);
+			Response result = parseResponse(m, request);
 
 			if (result == null) {
 				System.out.println("IGS: " + addr + ":" + port + " returned (null) for request: " + request);
@@ -150,7 +150,7 @@ public class InterGroupServer implements Runnable {
 			return message.toWire();
 	}
 
-	private static FERNObject parseResponse(Message response, Request request) {
+	private static Response parseResponse(Message response, Request request) {
 		Header header = response.getHeader();
 
 		if (header.getRcode() == Rcode.NXDOMAIN) {
@@ -169,23 +169,67 @@ public class InterGroupServer implements Runnable {
 		}
 
 		org.xbill.DNS.Record question = response.getQuestion();
-
 		// sanity check on question here...
 
 		org.xbill.DNS.Record[] records = response.getSectionArray(Section.ANSWER);
 
-		// simplest alg: just return the first valid record...
-		org.xbill.DNS.Record r = records[0];
-		Name n = new Name(r.getName());
-		FERNObject object = new FERNObject(n);
-		object.addRecord(new Record(r));
-
-		for(int i = 1; i < records.length; i++) {
-			r = records[i];
-			object.addRecord(new Record(r));
+		if (records.length == 0) {
+			System.out.println("IGS error: empty record set!");
+			return null;
 		}
 
-		return object;
+		return parseRecordSet(request, records);
+	}
+
+	private static Response parseRecordSet(Request request, org.xbill.DNS.Record[] records) {
+		// simplest alg: just return the first valid record...
+		// org.xbill.DNS.Record r = records[0];
+		// Name n = new Name(r.getName());
+		// FERNObject object = new FERNObject(n);
+		// object.addRecord(new Record(r));
+
+		// return object;
+
+		// FIRST we must sort the records into a set of FERNObjects
+		ArrayList<FERNObject> objects = new ArrayList<FERNObject>();
+
+outer:	for(int i = 0; i < records.length; i++) {
+			Record rec = new Record(records[i]);
+inner:		for (FERNObject obj : objects) {
+				if (rec.name.equals(obj.name)) {
+					obj.addRecord(rec);
+					continue outer;
+				}
+			}
+			// looked through all existing objects and did't find
+			// a match, so now we create a new object with this name.
+			FERNObject obj = new FERNObject(rec.name);
+			obj.addRecord(rec);
+			objects.add(obj);
+		}
+
+		// NEXT, we choose the best-match object to set as the response
+		Response response = null;
+		for (FERNObject obj : objects) {
+			if (obj.isExactMatch(request)) {
+				response = new Response(obj);
+				break;
+			}
+		}
+
+		if (response == null) {
+			response = new Response(null);
+		}
+
+		// LAST, we make sure to add the other objects and request
+		response.setRequest(request);
+		for (FERNObject obj : objects) {
+			if (!obj.equals(response.getObject())) {
+				response.addOtherEntry(obj);
+			}
+		}
+
+		return response;
 	}
 }
 
@@ -312,19 +356,27 @@ class InterGroupThread extends Thread {
 			return Rcode.NOTIMP;
 		}
 
-		FERNObject object = mdns.resolveService(request);
-		if (object == null) {
+		Response resp = mdns.resolveService(request);
+		if (resp == null) {
 			return Rcode.NXDOMAIN;
 		}
 
-		if (object.getRecordSet().isEmpty()) {
+		if (resp.getObject().equals(Response.NULL_OBJECT)) {
 			return Rcode.NXDOMAIN;
 		}
 
-		for (Record fern_rec : object.getRecordSet()) {
+		for (Record fern_rec : resp.getObject().getRecordSet()) {
 			org.xbill.DNS.Record rec = fern_rec.toDNSRecord();
 			RRset rset = new RRset(rec);
-			addRRset(queryRecord.getName(), response, rset, Section.ANSWER, flags);
+			addRRset(resp.getObject().name.toDNSName(), response, rset, Section.ANSWER, flags);
+		}
+
+		for (FERNObject obj : resp.getOtherEntries()) {
+			for (Record fern_rec : obj.getRecordSet()) {
+				org.xbill.DNS.Record rec = fern_rec.toDNSRecord();
+				RRset rset = new RRset(rec);
+				addRRset(obj.name.toDNSName(), response, rset, Section.ANSWER, flags);
+			}
 		}
 
 		return Rcode.NOERROR;

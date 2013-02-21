@@ -44,12 +44,12 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		String line = new String("GROUP TOP 2 ucsc.global join 128.114.59.75 5301");
 		CommandLineParser.readCommandLine(line, m.mdns);
 		Request r = new Request("xxx.global");
-		FERNObject o = m.mdns.resolveService(r);
-		if (o != null) {
-			System.out.println("RESOLVED REQUEST: " + r);
-			o.printFull();
+		Response resp = m.mdns.resolveService(r);
+		if (resp != null) {
+			System.out.println("RESOLVED REQUEST: " + resp);
+			resp.pp();
 		} else {
-			System.out.println("COULD NOT RESOLVE REQUEST: " + r);
+			System.out.println("COULD NOT RESOLVE REQUEST: " + resp);
 		}
 	}
 
