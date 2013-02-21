@@ -42,7 +42,19 @@ public class Response {
 	}
 
 	public void pp() {
-		System.out.println("Response.java pretty-print must be written!");
+		System.out.println("Request: " + request);
+		System.out.println("Returned Object Name: " + object);
+		System.out.println("Records: ");
+		System.out.println(Record.HEADER);
+		for (Record r : object.getRecordSet()) {
+			System.out.println(r);
+		}
+		for (FERNObject o : otherEntries) {
+			for (Record r : o.getRecordSet()) {
+				System.out.println(r);
+			}
+		}
+		
 		return;
 	}
 }

@@ -2,8 +2,6 @@
 
 package com.spencersevilla.fern;
 
-import java.util.HashMap;
-
 /**
  * Constants and functions relating to DNS Types
  *
@@ -203,6 +201,10 @@ public final class Type {
 	public static void check(int val) throws Exception {
 		if (val < 0 || val > 0xFFFF)
 			throw new Exception("Type: invalid value!");
+	}
+
+	public static String toString(int val) {
+		return org.xbill.DNS.Type.string(val);
 	}
 
 

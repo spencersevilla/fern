@@ -43,7 +43,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 
 		String line = new String("GROUP TOP 2 ucsc.global join 128.114.59.75 5301");
 		CommandLineParser.readCommandLine(line, m.mdns);
-		Request r = new Request("xxx.global");
+		Request r = new Request("ccrg-server.ucsc");
 		Response resp = m.mdns.resolveService(r);
 		if (resp != null) {
 			System.out.println("RESOLVED REQUEST: " + resp);

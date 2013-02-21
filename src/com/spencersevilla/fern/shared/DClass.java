@@ -31,4 +31,9 @@ public final class DClass {
 
 	/** Matches any class */
 	public static final int ANY		= 255;
+
+	public static String toString(int val) {
+		return org.xbill.DNS.DClass.string(val);
+	}
+
 }

@@ -141,7 +141,7 @@ public class InterGroupServer implements Runnable {
 	}
 
 	private static byte[] generateRequest(Request request) {
-			Name name = request.name;
+			Name name = new Name(request.name);
 			name.fernify();
 			org.xbill.DNS.Name n = name.toDNSName();
 

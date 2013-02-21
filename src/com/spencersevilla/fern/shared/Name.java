@@ -24,6 +24,10 @@ public class Name {
 		length = nameArray.length;
 	}
 
+	public Name(Name n) {
+		this(n.getName());
+	}
+
 	public Name(String[] array) {
 		if (array == null) {
 			System.err.println("Name: ERROR: null array!");

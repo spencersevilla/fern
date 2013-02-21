@@ -4,6 +4,8 @@ import java.util.*;
 import java.io.*;
 
 public class Record {
+	public static final String HEADER = String.format("%-25s%-10s%-10s%-10s%-10s", "NAME", "TYPE", "CLASS", "TTL", "DATA");
+
 	protected Name name;
 	protected int type, dclass;
 	protected long ttl;
@@ -28,7 +30,7 @@ public class Record {
 	}
 
 	public String toString() {
-		return new String(name + TAB + type + TAB + dclass + TAB + ttl + TAB + dataString());
+		return String.format("%-25s%-10s%-10s%-10s%-10s", name, Type.toString(type), DClass.toString(dclass), ttl, dataString());
 	}
 
 	private String dataString() {
