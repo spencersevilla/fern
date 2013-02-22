@@ -398,9 +398,9 @@ class InterGroupThread extends Thread {
 		int type = queryRecord.getType();
 
 		// check for our TLD suffix
-		if (!nameString.endsWith("fern.") && !nameString.endsWith("fern")) {
-			return true;
-		}
+		// if (!nameString.endsWith("fern.") && !nameString.endsWith("fern")) {
+		// 	return true;
+		// }
 
 		// we've sanity-checked this record and it's okay for us to handle it!
 		// (it is an A record-query belonging to the .fern. TLD)
