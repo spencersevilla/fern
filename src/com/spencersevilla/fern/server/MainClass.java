@@ -43,7 +43,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 
 		String line = new String("GROUP TOP 2 ucsc.global join 128.114.59.75 5301");
 		CommandLineParser.readCommandLine(line, m.mdns);
-		Request r = new Request("tester.ucsc");
+		Request r = new Request("ucsc.");
 		Response resp = m.mdns.resolveService(r);
 		if (resp != null) {
 			System.out.println("RESOLVED REQUEST: " + resp);
@@ -139,9 +139,9 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		Name b = new Name("a.b.c");
 		Name c = new Name("c.d.e");
 		System.out.println("EQUALS: A.B.C == A.B.C ? " + a.equals(b));
-		a.fernify();
+		// a.fernify();
 		System.out.println("fernify a.b.c = " + a);
-		a.unfern();
+		// a.unfern();
 		System.out.println("unfern a.b.c.fern. = " + a);
 		System.out.println("getParent a.b.c. = " + a.getParent());
 		System.out.println("firstTerm a.b.c. = " + a.firstTerm());

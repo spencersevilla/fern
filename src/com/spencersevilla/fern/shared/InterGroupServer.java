@@ -142,7 +142,7 @@ public class InterGroupServer implements Runnable {
 
 	private static byte[] generateRequest(Request request) {
 			Name name = new Name(request.name);
-			name.fernify();
+			// name.fernify();
 			org.xbill.DNS.Name n = name.toDNSName();
 
 			org.xbill.DNS.Record query = org.xbill.DNS.Record.newRecord(n, Type.ANY, DClass.IN);
@@ -344,7 +344,7 @@ class InterGroupThread extends Thread {
 	byte generateAnswer(Message query, Message response, int flags) {
 		org.xbill.DNS.Record queryRecord = query.getQuestion();
 		Name name = new Name(queryRecord.getName());
-		name.unfern();
+		// name.unfern();
 		Request request = new Request(name);
 
 		int type = queryRecord.getType();
