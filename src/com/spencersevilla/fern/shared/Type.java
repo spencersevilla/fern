@@ -163,8 +163,11 @@ public final class Type {
 	/** Transport Layer Security Authentication, draft-ietf-dane-protocol-23 */
 	public static final int TLSA		= 52;
 
+	/* new content-record type for my ICND project */
+	public static final int ICN			= 56;
+
 	/** Sender Policy Framework (experimental) */
-	public static final int SPF		= 99;
+	public static final int SPF			= 99;
 
 	/** Transaction key - used to compute a shared secret or exchange a key */
 	public static final int TKEY		= 249;

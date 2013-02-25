@@ -21,6 +21,15 @@ public class CommandLineParser {
 	    		Name servicename = new Name(str);
 	    		m.createService(servicename);
 
+			} else if (type.equals("ICN")) {
+	    		String str = st.nextToken();
+	    		Name sname = new Name("icn");
+	    		Service s = new Service(sname);
+	    		String data = new String("XXX");
+	    		Record r = new Record(sname, Type.ICN, DClass.IN, 0, data.getBytes());
+	    		s.addRecord(r);
+	    		m.addService(s);
+
 			} else if (type.equals("DNS")) {
 				String addr = st.nextToken();
 				m.addDNSServer(addr);

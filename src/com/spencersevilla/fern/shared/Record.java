@@ -21,12 +21,20 @@ public class Record {
 		data = r.rdataToWireCanonical();
 	}
 
-	public Record(Name n, int t, int d, int tt, byte[] dat) {
+	public Record(Name n, int t, int d, long tt, byte[] dat) {
 		name = n;
 		type = t;
 		dclass = d;
 		ttl = tt;
 		data = dat;
+	}
+
+	public Record(Record r) {
+		name = r.name;
+		type = r.type;
+		dclass = r.dclass;
+		ttl = r.ttl;
+		data = r.data;
 	}
 
 	public String toString() {

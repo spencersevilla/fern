@@ -1,23 +1,45 @@
 package com.spencersevilla.fern;
 
 import java.net.*;
-import java.util.Enumeration;
+import java.util.*;
 
 public class Service {
 	public Name name;
-	public int port;
-	public InetAddress addr;
+	private ArrayList<Record> recordSet;
+
 	
-	public Service(Name n, int p, InetAddress a) {
+	public Service(Name n) {
 		name = n;
-		port = p;
-		addr = a;
-		
-		if (addr == null) {
-			addr = Service.generateAddress();
-		}
+		recordSet = new ArrayList<Record>();
 
 		return;
+	}
+
+	public ArrayList<Record> getRecordSet() {
+		return new ArrayList<Record>(recordSet);
+	}
+
+	public void addRecord(Record r) {
+		if (r.name != null) {
+			System.out.println("ERROR: record cannot have a name!");
+			return;
+		}
+
+		recordSet.add(r);
+	}
+
+	public void removeRecord(Record r) {
+		recordSet.remove(r);
+	}
+
+	public void generateRecord(InetAddress a) {
+		if (a == null) {
+			a = Service.generateAddress();
+		}
+
+		byte[] rdata = a.getAddress();
+		Record r = new Record(null, Type.A, DClass.IN, 0, rdata);
+		addRecord(r);
 	}
 	
 	public static InetAddress generateAddress() {

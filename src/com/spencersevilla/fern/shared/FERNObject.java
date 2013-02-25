@@ -46,13 +46,17 @@ public class FERNObject implements Serializable {
 	}
 	
 	// this is an awkward function that appends a servicename to
-	// the end of a FERNGroup name to create a fully-qualified FERN record.
+	// the end of a FERNGroup name to create a fully-qualified FERN object.
 	public FERNObject(Service service, FERNGroup group) {
 		this(service.name.concatenate(group.name));
 
-		byte[] rdata = service.addr.getAddress();
-		Record r = new Record(name, Type.A, DClass.IN, 0, rdata);
-		addRecord(r);
+		// copy over the record-set. Note that the names must be null
+		// since they came from a Service (unqualified Name)...
+		for (Record r : service.getRecordSet()) {
+			Record rec = new Record(name, r.type, r.dclass, r.ttl, r.data);
+			rec.name = name;
+			addRecord(rec);
+		}
 	}
 
 	// ideal for overwriting!

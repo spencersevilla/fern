@@ -144,8 +144,12 @@ public class FERNManager {
 	}
 
 	protected void createService(Name n) {
-		Service s = new Service(n, 0, this.address);
+		Service s = new Service(n);
+		s.generateRecord(this.address);
+		addService(s);
+	}
 
+	protected void addService(Service s) {
 		// check for duplicates here
 		if (serviceList.contains(s)) {
 			return;
