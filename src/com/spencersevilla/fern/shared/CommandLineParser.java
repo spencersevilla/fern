@@ -22,11 +22,10 @@ public class CommandLineParser {
 	    		m.createService(servicename);
 
 			} else if (type.equals("ICN")) {
-	    		String str = st.nextToken();
 	    		Name sname = new Name("icn");
 	    		Service s = new Service(sname);
 	    		String data = new String("XXX");
-	    		Record r = new Record(sname, Type.ICN, DClass.IN, 0, data.getBytes());
+	    		Record r = new Record(null, Type.ICN, DClass.IN, 0, data.getBytes());
 	    		s.addRecord(r);
 	    		m.addService(s);
 
