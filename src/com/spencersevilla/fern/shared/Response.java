@@ -1,8 +1,9 @@
 package com.spencersevilla.fern;
 
 import java.util.*;
+import java.io.*;
 
-public class Response {
+public class Response implements Serializable {
 	private FERNObject object;
 	private Request request;
 	private ArrayList<FERNObject> otherEntries;
@@ -13,7 +14,7 @@ public class Response {
 			o = NULL_OBJECT;
 		}
 
-		object = o;
+		object = new FERNObject(o);
 		otherEntries = new ArrayList<FERNObject>();
 	}
 
@@ -34,7 +35,7 @@ public class Response {
 	}
 
 	public void addOtherEntry(FERNObject o) {
-		otherEntries.add(o);
+		otherEntries.add(new FERNObject(o));
 	}
 
 	public ArrayList<FERNObject> getOtherEntries() {

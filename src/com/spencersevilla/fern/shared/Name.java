@@ -1,9 +1,10 @@
 package com.spencersevilla.fern;
 
 import java.util.*;
+import java.io.*;
 import org.xbill.DNS.TextParseException;
 
-public class Name {
+public class Name implements Serializable {
 	private String name;
 	private String[] nameArray;
 	private int length;

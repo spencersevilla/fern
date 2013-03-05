@@ -3,7 +3,7 @@ package com.spencersevilla.fern;
 import java.util.*;
 import java.io.*;
 
-public class Record {
+public class Record implements Serializable {
 	public static final String HEADER = String.format("%-25s%-10s%-10s%-10s%-10s", "NAME", "TYPE", "CLASS", "TTL", "DATA");
 
 	private Name name;
@@ -38,6 +38,10 @@ public class Record {
 	}
 
 	public Name getName() {
+		if (name == null) {
+			return null;
+		}
+		
 		return new Name(name);
 	}
 

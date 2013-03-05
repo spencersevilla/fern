@@ -1,8 +1,9 @@
 package com.spencersevilla.fern;
 
 import java.util.*;
+import java.io.*;
 
-public class Request {
+public class Request implements Serializable {
 	private Name name;
 	private int type;
 

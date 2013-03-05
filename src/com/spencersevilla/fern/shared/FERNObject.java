@@ -14,6 +14,11 @@ public class FERNObject implements Serializable {
 		recordSet = new ArrayList<Record>();
 	}
 
+	public FERNObject(FERNObject o) {
+		name = o.getName();
+		recordSet = o.getRecordSet();
+	}
+
 	public ArrayList<Record> getRecordSet() {
 		return recordSet;
 	}
