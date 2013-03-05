@@ -8,7 +8,7 @@
 	<property name="classes.dir" value="${build.dir}/classes"/>
 	<property name="jar.dir"     value="jar"/>
 	<property name="main-class"  value="com.spencersevilla.fern.server.MainClass"/>
-	<property name="main-class-interface"  value="com.spencersevilla.fern.server.FERNInterface"/>
+	<property name="main-class-interface"  value="com.spencersevilla.fern.FERNInterface"/>
 
 	<path id="classpath">
 		<fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -56,6 +56,16 @@
 		</jar>
 	</target>
 
+	<target name="run-interface" depends="jar-interface">
+		<java fork="true" classname="${main-class-interface}">
+			<classpath>
+				<path refid="classpath" />
+				<path path="${config.dir}" />
+				<path location="${jar.dir}/FERNInterface.jar" />
+			</classpath>
+		</java>
+	</target>
+
 <!-- ALIASES HERE FOR QUICK COMPILATION/RUNNING/TESTING -->
 	<target name="run" depends="clean, run-main" />
 
@@ -63,6 +73,8 @@
 	<target name="interface" depends="clean, jar-interface" />
 
 	<target name="all" depends="clean, jar-main, jar-interface" />	
+
+	<target name="run-test" depends="clean, run-interface" />
 
 <!-- 	<target name="debug" depends="jar">
 		<java fork="true" classname="${main-class}">
