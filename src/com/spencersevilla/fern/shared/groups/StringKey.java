@@ -1,4 +1,4 @@
-package com.spencersevilla.fern;
+package com.spencersevilla.fern.groups;
 
 import de.uniba.wiai.lspi.chord.service.Key;
 
