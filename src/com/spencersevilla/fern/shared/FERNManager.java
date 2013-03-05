@@ -21,6 +21,7 @@ public class FERNManager {
 	public ArrayList<FERNObject> cacheList;
 	public ArrayList<Service> serviceList;
 	public ArrayList<FERNGroup> allGroups;
+	private RMIServer rmi;
 
 	// This function only called ONCE! (initializer)
 	public FERNManager() throws Exception {
@@ -36,6 +37,7 @@ public class FERNManager {
 		// here we initialize (but don't start) all of the servers.
         // bs = new BootstrapServer(this);
 		igs = new InterGroupServer(this);
+		rmi = new RMIServer(this);
 
 		System.out.println("FERN: initialized!");
 	}
@@ -44,6 +46,7 @@ public class FERNManager {
 	public void start() throws Exception {
 		// bs.start();
 		igs.start();
+		rmi.start();
 		System.out.println("FERN: started!");
 	}
 	
