@@ -141,7 +141,7 @@ public class InterGroupServer implements Runnable {
 	}
 
 	private static byte[] generateRequest(Request request) {
-			Name name = new Name(request.name);
+			Name name = request.getName();
 			// name.fernify();
 			org.xbill.DNS.Name n = name.toDNSName();
 
@@ -196,14 +196,14 @@ public class InterGroupServer implements Runnable {
 outer:	for(int i = 0; i < records.length; i++) {
 			Record rec = new Record(records[i]);
 inner:		for (FERNObject obj : objects) {
-				if (rec.name.equals(obj.name)) {
+				if (rec.getName().equals(obj.getName())) {
 					obj.addRecord(rec);
 					continue outer;
 				}
 			}
 			// looked through all existing objects and did't find
 			// a match, so now we create a new object with this name.
-			FERNObject obj = new FERNObject(rec.name);
+			FERNObject obj = new FERNObject(rec.getName());
 			obj.addRecord(rec);
 			objects.add(obj);
 		}

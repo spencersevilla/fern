@@ -157,7 +157,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 			return;
 		}
 		
-		StringKey key = new StringKey(o.name.firstTerm().toString());
+		StringKey key = new StringKey(o.getName().firstTerm().toString());
 		
 		try {
 			chord.insert(key, o);
@@ -174,7 +174,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 			return;
 		}
 		
-		StringKey key = new StringKey(o.name.firstTerm().toString());
+		StringKey key = new StringKey(o.getName().firstTerm().toString());
 		
 		try {
 			chord.remove(key, o);

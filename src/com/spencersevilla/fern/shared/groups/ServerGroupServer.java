@@ -25,12 +25,12 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 
 	public void registerObject(FERNObject object) {
 		System.out.println("SGServer " + name + " server: registering object " + object);
-		if (!object.name.getParent().equals(name)) {
+		if (!object.getName().getParent().equals(name)) {
 			System.err.println("SGServer " + name + " error: " + object + "is not a child of " + name);
 			return;
 		}
 
-		Name key = object.name.firstTerm();
+		Name key = object.getName().firstTerm();
 
 		if (objects.get(key) != null) {
 			System.err.println("SGServer " + name + " error: there already exists a value for " + key);
@@ -42,12 +42,12 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 	}
 
 	public void removeObject(FERNObject object) {
-		if (!object.name.getParent().equals(name)) {
+		if (!object.getName().getParent().equals(name)) {
 			System.err.println("SGServer " + name + " error: " + object + "is not a child of " + name);
 			return;
 		}
 
-		Name key = object.name.firstTerm();
+		Name key = object.getName().firstTerm();
 
 		System.out.println("SGServer " + name + ": removing object " + object);
 		objects.remove(key);

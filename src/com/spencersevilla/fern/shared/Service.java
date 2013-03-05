@@ -4,7 +4,7 @@ import java.net.*;
 import java.util.*;
 
 public class Service {
-	public Name name;
+	private Name name;
 	private ArrayList<Record> recordSet;
 
 	
@@ -15,12 +15,16 @@ public class Service {
 		return;
 	}
 
+	public Name getName() {
+		return new Name(name);
+	}
+
 	public ArrayList<Record> getRecordSet() {
 		return new ArrayList<Record>(recordSet);
 	}
 
 	public void addRecord(Record r) {
-		if (r.name != null) {
+		if (r.getName() != null) {
 			System.out.println("ERROR: record cannot have a name!");
 			return;
 		}

@@ -234,10 +234,10 @@ public class FERNManager {
 
 		for (Service s : serviceList) {
 			// create new name by appending group to service
-			Name n = s.name.concatenate(group.name);
+			Name n = s.getName().concatenate(group.name);
 
 			// we've got a winner!!!
-			if (FERNObject.calculateScore(request.name, n) > groupScore) {
+			if (FERNObject.calculateScore(request.getName(), n) > groupScore) {
 				return new FERNObject(s, group);
 			}
 		}

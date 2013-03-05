@@ -5,7 +5,7 @@ import java.io.*;
 import java.net.InetAddress;
 
 public class FERNObject implements Serializable {
-	public Name name;
+	protected Name name;
 	private ArrayList<Record> recordSet;
 
 	public FERNObject(Name n) {
@@ -23,6 +23,10 @@ public class FERNObject implements Serializable {
 		return name.toString();
 	}
 
+	public Name getName() {
+		return new Name(name);
+	}
+
 	public final void pp() {
 		System.out.println("FERNObject Name: "+ name);
 		System.out.println(Record.HEADER);
@@ -37,7 +41,7 @@ public class FERNObject implements Serializable {
 			return;
 		}
 
-		if (!r.name.equals(name)) {
+		if (!r.getName().equals(name)) {
 			System.err.println("FERNObject error: cannot add record!");
 			return;
 		}
@@ -48,13 +52,12 @@ public class FERNObject implements Serializable {
 	// this is an awkward function that appends a servicename to
 	// the end of a FERNGroup name to create a fully-qualified FERN object.
 	public FERNObject(Service service, FERNGroup group) {
-		this(service.name.concatenate(group.name));
+		this(service.getName().concatenate(group.name));
 
 		// copy over the record-set. Note that the names must be null
 		// since they came from a Service (unqualified Name)...
 		for (Record r : service.getRecordSet()) {
-			Record rec = new Record(name, r.type, r.dclass, r.ttl, r.data);
-			rec.name = name;
+			Record rec = new Record(name, r.getType(), r.getDClass(), r.getTTL(), r.getData());
 			addRecord(rec);
 		}
 	}
@@ -64,9 +67,9 @@ public class FERNObject implements Serializable {
 	// 	return InterGroupServer.resolveName(request, addr, 53);
 		InetAddress a;
 		for (Record r : recordSet) {
-			if (r.type == Type.A) {
+			if (r.getType() == Type.A) {
 				try {
-					a = InetAddress.getByAddress(r.data);
+					a = InetAddress.getByAddress(r.getData());
 					return InterGroupServer.resolveName(request, a, 53);				
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -85,7 +88,7 @@ public class FERNObject implements Serializable {
 		// req = [parc, csl, spencer]
 		// objName = [global, parc, csl, spencer]
 
-		String[] req = request.name.getNameArray();
+		String[] req = request.getName().getNameArray();
 		String[] object = name.getNameArray();
 
 		// the entry's fullname may be longer than the request
@@ -115,7 +118,7 @@ public class FERNObject implements Serializable {
 	}
 
 	public final int calculateScore(Request request) {
-		return FERNObject.calculateScore(request.name, name);		
+		return FERNObject.calculateScore(request.getName(), name);		
 	}
 
 	public static final int calculateScore(Name servicename, Name groupname) {

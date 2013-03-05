@@ -3,8 +3,8 @@ package com.spencersevilla.fern;
 import java.util.*;
 
 public class Request {
-	public Name name;
-	public int type;
+	private Name name;
+	private int type;
 
 	public final String toString() {
 		return name.toString();
@@ -16,5 +16,9 @@ public class Request {
 
 	public Request(Name n) {
 		name = n;
+	}
+
+	public Name getName() {
+		return new Name(name);
 	}
 }

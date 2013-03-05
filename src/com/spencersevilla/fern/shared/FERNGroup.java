@@ -87,7 +87,7 @@ public abstract class FERNGroup extends FERNObject {
 	// if a match is not possible (ie query = spencer.csl.att) then
 	// return NULL because we cannot combine these two terms.
 	public Request extendRequest(Request request) {
-		String[] query = request.name.getNameArray();
+		String[] query = request.getName().getNameArray();
 		String[] groupname = name.getNameArray();
 
 
@@ -139,7 +139,7 @@ public abstract class FERNGroup extends FERNObject {
 			return null;
 		}
 
-		String[] querygroups = request.name.getNameArray();
+		String[] querygroups = request.getName().getNameArray();
 		String[] groups = name.getNameArray();
 
 	// NOW querygroups = [global, parc, csl, spencer] and groups = [global, parc].
