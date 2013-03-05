@@ -1,5 +1,6 @@
 <project name="FERNManager" basedir="." default="main">
 
+<!-- INITIALIZE UNIVERSAL VALUES HERE -->
 	<property name="src.dir"     value="src"/>
 	<property name="lib.dir"     value="lib"/>
 	<property name="build.dir"   value="build"/>
@@ -7,6 +8,7 @@
 	<property name="classes.dir" value="${build.dir}/classes"/>
 	<property name="jar.dir"     value="jar"/>
 	<property name="main-class"  value="com.spencersevilla.fern.server.MainClass"/>
+	<property name="main-class-interface"  value="com.spencersevilla.fern.server.FERNInterface"/>
 
 	<path id="classpath">
 		<fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -22,7 +24,8 @@
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on" debuglevel="lines,vars,source" classpathref="classpath" />
 	</target>
 
-	<target name="jar" depends="compile">
+<!-- MAIN FERN DAEMON (FOR USE IN FULL COMPUTERS) -->
+	<target name="jar-main" depends="compile">
 		<mkdir dir="${jar.dir}"/>
 		<jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
 			<manifest>
@@ -31,7 +34,7 @@
 		</jar>
 	</target>
 
-	<target name="run" depends="jar">
+	<target name="run-main" depends="jar-main">
 		<java fork="true" classname="${main-class}">
 			<classpath>
 				<path refid="classpath" />
@@ -41,7 +44,27 @@
 		</java>
 	</target>
 
-	<target name="debug" depends="jar">
+<!-- FERN ON ANDROID COMPILATION MACROS SHOULD GO HERE -->
+
+<!-- FERN INTERFACE FOR APPS (INCLUDE JAR IN OTHER JAVA PROJECTS) -->
+	<target name="jar-interface" depends="compile">
+		<mkdir dir="${jar.dir}"/>
+		<jar destfile="${jar.dir}/FERNInterface.jar" basedir="${classes.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="${main-class-interface}"/>
+			</manifest>
+		</jar>
+	</target>
+
+<!-- ALIASES HERE FOR QUICK COMPILATION/RUNNING/TESTING -->
+	<target name="run" depends="clean, run-main" />
+
+	<target name="main" depends="clean, jar-main" />
+	<target name="interface" depends="clean, jar-interface" />
+
+	<target name="all" depends="clean, jar-main, jar-interface" />	
+
+<!-- 	<target name="debug" depends="jar">
 		<java fork="true" classname="${main-class}">
 			<classpath>
 				<path refid="classpath" />
@@ -51,17 +74,6 @@
 			<jvmarg value="-Xdebug" />
 			<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,address=6000" />
 		</java>
-	</target>
-
-	<target name="clean-build" depends="clean,jar"/>
-
-	<target name="main" depends="clean,run"/>
-
-	<target name="daemon" depends="clean,jar" />
-
-	<target name="info" >
-		<property name="myclasspath" refid="classpath"/>
-		<echo message="classpath = ${myclasspath}"/>
-	</target>
+	</target> -->
 
 </project>
