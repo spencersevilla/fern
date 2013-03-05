@@ -140,9 +140,9 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		Name c = new Name("c.d.e");
 		System.out.println("EQUALS: A.B.C == A.B.C ? " + a.equals(b));
 		// a.fernify();
-		System.out.println("fernify a.b.c = " + a);
+		// System.out.println("fernify a.b.c = " + a);
 		// a.unfern();
-		System.out.println("unfern a.b.c.fern. = " + a);
+		// System.out.println("unfern a.b.c.fern. = " + a);
 		System.out.println("getParent a.b.c. = " + a.getParent());
 		System.out.println("firstTerm a.b.c. = " + a.firstTerm());
 	}
