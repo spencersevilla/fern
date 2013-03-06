@@ -30,19 +30,10 @@ public class MainClass implements Daemon, DaemonUserSignal {
 			System.exit(0);
 		}
 
-		// if (args.length > 0) {
-		// 	m.conf = args[0];
-		// } else {
-		// 	m.conf = "config/mdns.conf";
-		// }
-
-		// m.start();
 		m.mdns.start();
 
-		String line = new String("GROUP TOP 2 global create 5301");
-		String line2 = new String("SERVICE laptop");
-		CommandLineParser.readCommandLine(line, m.mdns);
-		CommandLineParser.readCommandLine(line2, m.mdns);
+		// CommandLineParser.readCommandLine(line, m.mdns);
+		// CommandLineParser.readCommandLine(line2, m.mdns);
 		// Request r = new Request("ucsc.");
 		// Response resp = m.mdns.resolveService(r);
 		// if (resp != null) {
@@ -81,7 +72,7 @@ public class MainClass implements Daemon, DaemonUserSignal {
 	public void start() throws Exception {
 		de.uniba.wiai.lspi.chord.service.PropertiesLoader.loadPropertyFile();
 		mdns.start();
-		readConf(conf);
+		// readConf(conf);
 		System.out.println("daemon: started.");
 	}
 
@@ -98,51 +89,11 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		System.out.println("signal called!");
 	}
 
-	// readConf uses a conf file to carry ALL the group information! this is the only way
-	// for us to "issue commands" to the headless operator
-	public void readConf(String conffile) {
-		FileInputStream fs;
-		InputStreamReader isr;
-		BufferedReader br;
-
-		try {
-			fs = new FileInputStream(conffile);
-			isr = new InputStreamReader(fs);
-			br = new BufferedReader(isr);
-		}
-		catch (Exception e) {
-			System.err.println("daemon: could not open " + conffile);
-			return;
-		}
-
-		String line = null;
-		try {
-			while ((line = br.readLine()) != null) {
-				if (!line.equals("")) {
-					CommandLineParser.readCommandLine(line, mdns);					
-				}
-	        }
-		} catch (IOException e) {
-			// do nothing special here, we've already broken out of the loop
-		}
-
-		try {
-			fs.close();
-		} catch (IOException e) {
-			// do nothing special here
-		}
-   		return;
-	}
-
 	public static void testName() {
 		Name a = new Name("a.b.c");
 		Name b = new Name("a.b.c");
 		Name c = new Name("c.d.e");
 		System.out.println("EQUALS: A.B.C == A.B.C ? " + a.equals(b));
-		// a.fernify();
-		// System.out.println("fernify a.b.c = " + a);
-		// a.unfern();
-		// System.out.println("unfern a.b.c.fern. = " + a);
 		System.out.println("getParent a.b.c. = " + a.getParent());
 		System.out.println("firstTerm a.b.c. = " + a.firstTerm());
 	}
