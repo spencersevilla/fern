@@ -16,6 +16,7 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 	public void start() {
 		thread = new Thread(this);
 		thread.start();
+		System.out.println("SGServer " + name + ": started.");
 	}
 
 	public void stop() {
