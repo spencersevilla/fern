@@ -2,17 +2,27 @@ package com.spencersevilla.fern;
 
 import java.net.*;
 import java.util.*;
+import java.io.*;
 
-public class Service {
+public class Service implements Serializable {
 	private Name name;
 	private ArrayList<Record> recordSet;
-
 	
 	public Service(Name n) {
 		name = n;
 		recordSet = new ArrayList<Record>();
+	}
 
-		return;
+	@Override public final boolean equals(Object otherObject) {
+		// check for self-comparison
+		if ( this == otherObject ) return true;
+		// check for null and ensure class membership
+		if ( !(otherObject instanceof Service) ) return false;
+		
+		Service that = (Service) otherObject;
+		
+		// traps for null-cases
+		return this.name == null ? that.name == null : this.name.equals(that.name);
 	}
 
 	public Name getName() {

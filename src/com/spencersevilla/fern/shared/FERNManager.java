@@ -89,6 +89,7 @@ public class FERNManager {
 		}
 
 		allGroups.add(group);
+		joinGroup(group);
 		return group;
 	}
 
@@ -141,21 +142,41 @@ public class FERNManager {
 		}
 	}
 
-	protected void leaveGroup(FERNGroup g) {
+	protected int leaveGroup(FERNGroup g) {
 		g.stop();
 		groupList.remove(g);
+		return 0;
 	}
 
-	protected void createService(Name n) {
-		Service s = new Service(n);
-		s.generateRecord(this.address);
-		addService(s);
-	}
+	// protected int createService(Name n) {
+	// 	Service s = new Service(n);
 
-	protected void addService(Service s) {
+	// 	if (serviceList.contains(s)) {
+	// 		return -1;
+	// 	}
+
+	// 	s.generateRecord(this.address);
+	// 	addService(s);
+	// 	System.out.println("FERN: created service " + s);
+	// 	return 0;
+	// }
+
+	// protected int removeService(Name n) {
+	// 	Service s = new Service(n);
+
+	// 	if (!serviceList.contains(s)) {
+	// 		return -1;
+	// 	}
+
+	// 	deleteService(s);
+	// 	System.out.println("FERN: removed service " + s);
+	// 	return 0;
+	// }
+
+	protected int registerService(Service s) {
 		// check for duplicates here
 		if (serviceList.contains(s)) {
-			return;
+			return -1;
 		}
 		
 		// alert all FERNGroup instances
@@ -164,15 +185,24 @@ public class FERNManager {
 		}
 
 		serviceList.add(s);
+		System.out.println("FERN: added service " + s);
+		return 0;
 	}
 
-	protected void deleteService(Service s) {
+	protected int removeService(Service s) {
+		// check to make sure we have it here
+		if (!serviceList.contains(s)) {
+			return -1;
+		}
+
 		// alert all FERNGroup instances
 		for (FERNGroup group : groupList) {
 			group.removeService(s);
 		}
 		
 		serviceList.remove(s);
+		System.out.println("FERN: deleted service " + s);
+		return 0;
 	}
 
 	public Response resolveService(Request request) {

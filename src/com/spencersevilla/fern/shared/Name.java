@@ -2,7 +2,6 @@ package com.spencersevilla.fern;
 
 import java.util.*;
 import java.io.*;
-import org.xbill.DNS.TextParseException;
 
 public class Name implements Serializable {
 	private String name;
@@ -79,20 +78,6 @@ public class Name implements Serializable {
 
 	// org.xbill.DNS.Name wrappers ============================================
 
-	public org.xbill.DNS.Name toDNSName() {
-		try {
-			String s = name;
-
-			if (!s.endsWith(".")) {
-				s = s.concat(".");
-			}
-			return new org.xbill.DNS.Name(s);
-			
-		} catch (TextParseException e) {
-			System.err.println("BIG ERROR: could not generate xbill.DNS.Name!");
-			return null;
-		}
-	}
 
 	public void terminate() {
 		if (!name.endsWith(".")) {
@@ -100,9 +85,9 @@ public class Name implements Serializable {
 		}
 	}
 
-	public Name(org.xbill.DNS.Name n) {
-		this(n.toString());
-	}
+	// public Name(org.xbill.DNS.Name n) {
+	// 	this(n.toString());
+	// }
 
 	public void fernify() {
 		if (!name.endsWith(".")) {

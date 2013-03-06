@@ -18,6 +18,7 @@ import org.xbill.DNS.Flags;
 import org.xbill.DNS.ExtendedFlags;
 import org.xbill.DNS.OPTRecord;
 import org.xbill.DNS.Opcode;
+import org.xbill.DNS.TextParseException;
 
 public class InterGroupServer implements Runnable {
 
@@ -140,10 +141,25 @@ public class InterGroupServer implements Runnable {
 		return null;
 	}
 
+	public static org.xbill.DNS.Name toDNSName(Name n) {
+		try {
+			String s = n.getName();
+
+			if (!s.endsWith(".")) {
+				s = s.concat(".");
+			}
+			return new org.xbill.DNS.Name(s);
+			
+		} catch (TextParseException e) {
+			System.err.println("BIG ERROR: could not generate xbill.DNS.Name!");
+			return null;
+		}
+	}
+
 	private static byte[] generateRequest(Request request) {
 			Name name = request.getName();
 			// name.fernify();
-			org.xbill.DNS.Name n = name.toDNSName();
+			org.xbill.DNS.Name n = InterGroupServer.toDNSName(name);
 
 			org.xbill.DNS.Record query = org.xbill.DNS.Record.newRecord(n, Type.ANY, DClass.IN);
 			Message message = Message.newQuery(query);
@@ -343,7 +359,7 @@ class InterGroupThread extends Thread {
 
 	byte generateAnswer(Message query, Message response, int flags) {
 		org.xbill.DNS.Record queryRecord = query.getQuestion();
-		Name name = new Name(queryRecord.getName());
+		Name name = new Name(queryRecord.getName().toString());
 		// name.unfern();
 		Request request = new Request(name);
 
@@ -368,14 +384,17 @@ class InterGroupThread extends Thread {
 		for (Record fern_rec : resp.getObject().getRecordSet()) {
 			org.xbill.DNS.Record rec = fern_rec.toDNSRecord();
 			RRset rset = new RRset(rec);
-			addRRset(resp.getObject().name.toDNSName(), response, rset, Section.ANSWER, flags);
+
+
+
+			addRRset(InterGroupServer.toDNSName(resp.getObject().name), response, rset, Section.ANSWER, flags);
 		}
 
 		for (FERNObject obj : resp.getOtherEntries()) {
 			for (Record fern_rec : obj.getRecordSet()) {
 				org.xbill.DNS.Record rec = fern_rec.toDNSRecord();
 				RRset rset = new RRset(rec);
-				addRRset(obj.name.toDNSName(), response, rset, Section.ANSWER, flags);
+				addRRset(InterGroupServer.toDNSName(obj.name), response, rset, Section.ANSWER, flags);
 			}
 		}
 

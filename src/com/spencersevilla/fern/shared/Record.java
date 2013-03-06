@@ -14,7 +14,7 @@ public class Record implements Serializable {
 	private final String TAB = new String("\t");
 
 	public Record(org.xbill.DNS.Record r) {
-		name = new Name(r.getName());
+		name = new Name(r.getName().toString());
 		type = r.getType();
 		dclass = r.getDClass();
 		ttl = r.getTTL();
@@ -78,6 +78,6 @@ public class Record implements Serializable {
 	}
 
 	public org.xbill.DNS.Record toDNSRecord(){
-		return org.xbill.DNS.Record.newRecord(name.toDNSName(), type, dclass, ttl, data);
+		return org.xbill.DNS.Record.newRecord(InterGroupServer.toDNSName(name), type, dclass, ttl, data);
 	}
 }
