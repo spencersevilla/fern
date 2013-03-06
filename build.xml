@@ -7,6 +7,7 @@
 	<property name="config.dir"	 value="config"/>
 	<property name="classes.dir" value="${build.dir}/classes"/>
 	<property name="jar.dir"     value="jar"/>
+	<property name="utils.dir"     value="utils"/>
 	<property name="main-class"  value="com.spencersevilla.fern.server.MainClass"/>
 	<property name="main-class-interface"  value="com.spencersevilla.fern.FERNInterface"/>
 
@@ -54,6 +55,7 @@
 				<attribute name="Main-Class" value="${main-class-interface}"/>
 			</manifest>
 		</jar>
+		<copy file="${jar.dir}/FERNInterface.jar"  todir="${utils.dir}" />
 	</target>
 
 	<target name="run-interface" depends="jar-interface">
