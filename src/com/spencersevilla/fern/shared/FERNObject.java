@@ -68,27 +68,26 @@ public class FERNObject implements Serializable {
 	}
 
 	// ideal for overwriting!
-	public Response forwardRequest(Request request) {
-	// 	return InterGroupServer.resolveName(request, addr, 53);
+	public Response forwardMessage(Message message) {
 		InetAddress a;
 		for (Record r : recordSet) {
 			if (r.getType() == Type.A) {
 				try {
 					a = InetAddress.getByAddress(r.getData());
-					return InterGroupServer.resolveName(request, a, 53);				
+					return InterGroupServer.sendMessage(message, a, 53);				
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		System.err.println("ERROR: forwardRequest called on a FERNObject with no valid A-record!!!");
+		System.err.println("ERROR: forwardMessage called on a FERNObject with no valid A-record!!!");
 		return null;
 	}
 
 	// This function returns 'true' iff the request-name could
 	// potentially be construed to refer to the object itself.
 	// NOTE that we MUST be referring to an object's FULL NAME!
-	public boolean isExactMatch(Request request) {
+	public boolean isExactMatch(Message request) {
 		boolean retval = true;
 		// req = [parc, csl, spencer]
 		// objName = [global, parc, csl, spencer]
@@ -122,7 +121,7 @@ public class FERNObject implements Serializable {
 		return FERNObject.calculateScore(request, name);		
 	}
 
-	public final int calculateScore(Request request) {
+	public final int calculateScore(Message request) {
 		return FERNObject.calculateScore(request.getName(), name);		
 	}
 
@@ -179,11 +178,11 @@ public class FERNObject implements Serializable {
 		return count;
 	}
 
-	public static FERNObject findBestMatch(Request request, ArrayList<? extends FERNObject> array) {
+	public static FERNObject findBestMatch(Message request, ArrayList<? extends FERNObject> array) {
 		return FERNObject.findBestMatch(request, array, null);
 	}
 
-	public static FERNObject findBestMatch(Request request, ArrayList<? extends FERNObject> array, FERNObject initial) {
+	public static FERNObject findBestMatch(Message request, ArrayList<? extends FERNObject> array, FERNObject initial) {
 
 		FERNObject bestChoice = null;
 		int highScore = 0;

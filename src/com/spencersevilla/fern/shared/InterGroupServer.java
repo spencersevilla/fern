@@ -9,7 +9,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.xbill.DNS.Message;
+// import org.xbill.DNS.Message;
 import org.xbill.DNS.Header;
 import org.xbill.DNS.Section;
 import org.xbill.DNS.Rcode;
@@ -99,47 +99,6 @@ public class InterGroupServer implements Runnable {
             e.printStackTrace();
         }
 	}
-	
-	public static Response resolveName(Request request, InetAddress addr, int port) {
-		try {
-			byte[] sendbuf = generateRequest(request);
-			if (sendbuf == null) {
-				System.err.println("IGS error: sendbuf is null");
-				return null;
-			}
-
-			DatagramPacket sendpack = new DatagramPacket(sendbuf, sendbuf.length, addr, port);
-
-			byte[] recbuf = new byte[1024];
-			DatagramPacket recpack = new DatagramPacket(recbuf, recbuf.length);
-			DatagramSocket sock = new DatagramSocket();
-			sock.setSoTimeout(10000);
-
-			System.out.println("IGS: requesting " + request + " from " + addr + ":" + port);
-
-			sock.send(sendpack);
-
-			// Timeout Breaks Here!
-			sock.receive(recpack);
-
-			Message m = new Message(recpack.getData());
-			Response result = parseResponse(m, request);
-
-			if (result == null) {
-				System.out.println("IGS: " + addr + ":" + port + " returned (null) for request: " + request);
-			} else {
-				System.out.println("IGS: " + addr + ":" + port + " returned answer for request: " + request);
-			}
-
-			return result;
-		} catch (SocketTimeoutException e) {
-			// timed out! :-(
-			System.err.println("IGS error: socket timed out");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
 	public static org.xbill.DNS.Name toDNSName(Name n) {
 		try {
@@ -155,18 +114,96 @@ public class InterGroupServer implements Runnable {
 			return null;
 		}
 	}
+	
+	public static Response sendMessage(Message message, InetAddress addr, int port) {
+		try {
+			byte[] sendbuf = generateDNSMessage(message);
+			if (sendbuf == null) {
+				System.err.println("IGS error: sendbuf is null");
+				return null;
+			}
 
-	private static byte[] generateRequest(Request request) {
-			Name name = request.getName();
-			// name.fernify();
-			org.xbill.DNS.Name n = InterGroupServer.toDNSName(name);
+			DatagramPacket sendpack = new DatagramPacket(sendbuf, sendbuf.length, addr, port);
 
-			org.xbill.DNS.Record query = org.xbill.DNS.Record.newRecord(n, Type.ANY, DClass.IN);
-			Message message = Message.newQuery(query);
-			return message.toWire();
+			byte[] recbuf = new byte[1024];
+			DatagramPacket recpack = new DatagramPacket(recbuf, recbuf.length);
+			DatagramSocket sock = new DatagramSocket();
+			sock.setSoTimeout(10000);
+
+			System.out.println("IGS: sending message-name " + message + " to " + addr + ":" + port);
+
+			sock.send(sendpack);
+
+			// Timeout Breaks Here!
+			sock.receive(recpack);
+
+			org.xbill.DNS.Message response = new org.xbill.DNS.Message(recpack.getData());
+			Response result = parseDNSResponse(response, message);
+
+			if (result == null) {
+				System.out.println("IGS: " + addr + ":" + port + " returned (null) for message: " + message);
+			} else {
+				System.out.println("IGS: " + addr + ":" + port + " returned answer for message: " + message);
+			}
+
+			return result;
+		} catch (SocketTimeoutException e) {
+			// timed out! :-(
+			System.err.println("IGS error: socket timed out");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	private static Response parseResponse(Message response, Request request) {
+	public static byte[] generateDNSMessage(Message m) {
+		if (m instanceof Request) {
+			Request r = (Request) m;
+			return generateRequest(r);
+		} else if (m instanceof Request) {
+			Registration r = (Registration) m;
+			return generateUpdate(r);
+		}
+		return null;
+	}
+
+	private static byte[] generateRequest(Request request) {
+		Name name = request.getName();
+		// name.fernify();
+		org.xbill.DNS.Name n = InterGroupServer.toDNSName(name);
+
+		org.xbill.DNS.Record query = org.xbill.DNS.Record.newRecord(n, Type.ANY, DClass.IN);
+		org.xbill.DNS.Message message = org.xbill.DNS.Message.newQuery(query);
+		return message.toWire();
+	}
+
+	private static byte[] generateUpdate(Registration registration) {
+		if (registration.getRecord() == null) {
+			// nothing to update/register?
+			return null;
+		}
+
+		Name name = registration.getName();
+		org.xbill.DNS.Name n = InterGroupServer.toDNSName(name);
+		org.xbill.DNS.Message message = org.xbill.DNS.Message.newUpdate(n);
+		org.xbill.DNS.Record dns_rec = registration.getRecord().toDNSRecord();
+		message.addRecord(dns_rec, Section.UPDATE);
+
+		return message.toWire();
+	}
+
+	private static Response parseDNSResponse(org.xbill.DNS.Message response, Message message) {
+		if (message instanceof Request) {
+			Request request = (Request) message;
+			return parseRequestResponse(response, request);
+		} else if (message instanceof Registration) {
+			Registration reg = (Registration) message;
+			return parseRegistrationResponse(response, reg);
+		}
+		return null;
+	}
+
+	private static Response parseRequestResponse(org.xbill.DNS.Message response, Request request) {
 		Header header = response.getHeader();
 
 		if (header.getRcode() == Rcode.NXDOMAIN) {
@@ -195,6 +232,27 @@ public class InterGroupServer implements Runnable {
 		}
 
 		return parseRecordSet(request, records);
+	}
+
+	private static Response parseRegistrationResponse(org.xbill.DNS.Message response, Registration request) {
+		Header header = response.getHeader();
+
+		if (header.getRcode() == Rcode.NXDOMAIN) {
+			// no error-alert here, this is a standard operation.
+			return null;
+		}
+
+		if (header.getRcode() != Rcode.NOERROR) {
+			System.out.println("IGS error: header Rcode is " + header.getRcode());
+			return null;
+		}
+
+		if (!header.getFlag(Flags.QR)) {
+			System.err.println("IGS error: response not a QR");
+			return null;
+		}
+
+		return null;
 	}
 
 	private static Response parseRecordSet(Request request, org.xbill.DNS.Record[] records) {
@@ -289,7 +347,7 @@ class InterGroupThread extends Thread {
 
 	// this function borrows HEAVILY from jnamed.java's generateReply function!
     byte [] generateResponse() throws IOException {
-    	Message query = new Message(inpacket.getData());
+    	org.xbill.DNS.Message query = new org.xbill.DNS.Message(inpacket.getData());
     	Header header = query.getHeader();
     	int maxLength = 0;
 		int flags = 0;
@@ -330,7 +388,7 @@ class InterGroupThread extends Thread {
 			flags = FLAG_DNSSECOK;
 
 		// prep the response with DNS data
-		Message response = new Message(query.getHeader().getID());
+		org.xbill.DNS.Message response = new org.xbill.DNS.Message(query.getHeader().getID());
 		response.getHeader().setFlag(Flags.QR);
 		if (query.getHeader().getFlag(Flags.RD)) {
 			response.getHeader().setFlag(Flags.RD);
@@ -357,7 +415,7 @@ class InterGroupThread extends Thread {
 		return response.toWire(maxLength);
 	}
 
-	byte generateAnswer(Message query, Message response, int flags) {
+	byte generateAnswer(org.xbill.DNS.Message query, org.xbill.DNS.Message response, int flags) {
 		org.xbill.DNS.Record queryRecord = query.getQuestion();
 		Name name = new Name(queryRecord.getName().toString());
 		// name.unfern();
@@ -406,7 +464,7 @@ class InterGroupThread extends Thread {
 		// }
 	}
 
-	boolean shouldForward(Message query) {
+	boolean shouldForward(org.xbill.DNS.Message query) {
 		org.xbill.DNS.Record queryRecord = query.getQuestion();
 
 		if (queryRecord == null) {
@@ -428,7 +486,7 @@ class InterGroupThread extends Thread {
 
 	// this function forwards the query onto an ACTUAL DNS server and then just
 	// returns whatever message it's given
-	byte [] queryRegularDNS(Message query) {
+	byte [] queryRegularDNS(org.xbill.DNS.Message query) {
 		if (server.dns_addrs.isEmpty()) {
 			return null;
 		}
@@ -463,13 +521,13 @@ class InterGroupThread extends Thread {
 		}
 	}
 
-	byte [] errorMessage(Message query, int rcode) {	
+	byte [] errorMessage(org.xbill.DNS.Message query, int rcode) {	
 		return buildErrorMessage(query.getHeader(), rcode,
 					 query.getQuestion());
 	}
 
 	byte [] buildErrorMessage(Header header, int rcode, org.xbill.DNS.Record question) {
-		Message response = new Message();
+		org.xbill.DNS.Message response = new org.xbill.DNS.Message();
 		response.setHeader(header);
 		for (int i = 0; i < 4; i++)
 			response.removeAllRecords(i);
@@ -479,7 +537,7 @@ class InterGroupThread extends Thread {
 		return response.toWire();
 	}
 
-	void addRRset(org.xbill.DNS.Name name, Message response, RRset rrset, int section, int flags) {
+	void addRRset(org.xbill.DNS.Name name, org.xbill.DNS.Message response, RRset rrset, int section, int flags) {
 		for (int s = 1; s <= section; s++)
 			if (response.findRRset(name, rrset.getType(), s))
 				return;

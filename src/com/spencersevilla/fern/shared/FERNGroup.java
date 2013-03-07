@@ -86,8 +86,8 @@ public abstract class FERNGroup extends FERNObject {
 	// we wish to produce the full request spencer.csl.parc.global.
 	// if a match is not possible (ie query = spencer.csl.att) then
 	// return NULL because we cannot combine these two terms.
-	public Request extendRequest(Request request) {
-		String[] query = request.getName().getNameArray();
+	public Name extendName(Name message) {
+		String[] query = message.getNameArray();
 		String[] groupname = name.getNameArray();
 
 
@@ -116,7 +116,7 @@ public abstract class FERNGroup extends FERNObject {
 			ret[i + startIndex] = query[i];
 		}
 
-		return new Request(new Name(ret));
+		return new Name(ret);
 	}
 	
 	// this returns a boolean that shows if this group is as good 
@@ -129,17 +129,17 @@ public abstract class FERNGroup extends FERNObject {
 		return (score == maxLength);
 	}
 	
-	protected final Name findNextHop(Request request) {
+	protected final Name findNextHop(Message message) {
 	// GOAL: compare the request "spencer.csl.parc"
 	// with the groupname "parc.global" to produce the Name
 	// "csl" which will be the next group to look for!
 	// This function returns the macro "PARENT" if moving UP the tree.
-		Request req = extendRequest(request);
-		if (req == null) {
+		Name fullreq = extendName(message.getName());
+		if (fullreq == null) {
 			return null;
 		}
 
-		String[] querygroups = request.getName().getNameArray();
+		String[] querygroups = fullreq.getNameArray();
 		String[] groups = name.getNameArray();
 
 	// NOW querygroups = [global, parc, csl, spencer] and groups = [global, parc].
@@ -155,23 +155,23 @@ public abstract class FERNGroup extends FERNObject {
 		return new Name(querygroups[groups.length]);
 	}
 	
-	public final Response forwardRequest(Request request) {
-		FERNObject o = resolveName(request);
+	public final Response forwardMessage(Message message) {
+		FERNObject o = readMessage(message);
 
-		// we got all the way to the end, but the record doesn't exist!
+		// we got all the way to the end, but something doesn't exist!
 		if (o == null) {
 			Response r = new Response(null);
-			r.setRequest(request);
+			r.setRequest(message);
 			return r;
 		}
 
-		if (o.isExactMatch(request)) {
+		if (o.isExactMatch(message)) {
 			Response r = new Response(o);
-			r.setRequest(request);
+			r.setRequest(message);
 			return r;
 		}
 
-		return o.forwardRequest(request);
+		return o.forwardMessage(message);
 	}
 
 // These functions MAY be overridden but are provided for ease-of-use in development
@@ -209,6 +209,15 @@ public abstract class FERNGroup extends FERNObject {
 
 	public void removeSubGroup(FERNGroup group) {
 		removeObject(group);
+	}
+
+	public FERNObject readMessage(Message message) {
+		// only message-type that *MUST* be supported...
+		if (message instanceof Request) {
+			Request req = (Request) message;
+			resolveName(req);
+		}
+		return null;
 	}
 
 // These functions MUST be overridden: they provide the core FERNGroup functionality!

@@ -206,38 +206,47 @@ public class FERNManager {
 	}
 
 	public Response resolveService(Request request) {
-		System.out.println("FERNManager resolving request: " + request);
+		return resolveMessage(request);
+	}
+
+	public Response resolveMessage(Message message) {
+		System.out.println("FERNManager processing message: " + message);
 		// ORDER OF OPERATIONS:
 		// First, find a FERNObject which is OUR best-match. This can be
 		// a record we're offering, an external group (cached?), a group we're a
 		// member of, or any other information we have our hands on.
-		FERNObject object = findBestMatch(request);
+		FERNObject object = findBestMatch(message);
 
 		// no matches? apparently we can't handle this request at all!
 		if (object == null) {
-			System.out.println("FERNManager: could not find ANY match for " + request);
+			System.out.println("FERNManager: could not find ANY match for " + message);
 			return null;
 		}
 
-		// this object fulfills the request, so we're done: return it!
-		if (object.isExactMatch(request)) {
-			Response r = new Response(object);
-			r.setRequest(request);
-			return r;
+		// for requests we might want to just RETURN here if we have an answer.
+		// other message-types must be delivered to the actual group itself,
+		// so we can't really short-circuit anything.
+		if (message instanceof Request) {
+			Request req = (Request) message;
+			if (object.isExactMatch(req)) {
+				Response r = new Response(object);
+				r.setRequest(req);
+				return r;
+			}
 		}
 
-		// our best-match isn't exact, so use it to keep forwarding.
+		// let's keep on forwarding this message to another group.
 		// note that when this response returns, we *add* our entry
 		// to it in order to facilitate caching! Note that we also
 		// still need to READ this response for other cached entries :-)
-		Response r = object.forwardRequest(request);
+		Response r = object.forwardMessage(message);
 		r.addOtherEntry(object);
 		return r;
 	}
 
 	// PRIVATE METHODS HERE ===================================================
 
-	private FERNObject findBestMatch(Request request) {
+	private FERNObject findBestMatch(Message request) {
 		// THIS is a major function that goes through our cache, services offered,
 		// FERNGroups we're a member of, and any other objects we may be aware of.
 		// It returns the best possible name-match across ALL objects.
@@ -259,7 +268,7 @@ public class FERNManager {
 	}
 	
 	// I think I want to move this method into the FERNGroup class...
-	private FERNObject checkNames(Request request, FERNGroup group) {
+	private FERNObject checkNames(Message request, FERNGroup group) {
 		// This function scans our list of Services (which are ONLY named
 		// with their shortname) to see if we can combine them to make a 
 		// better match on the request-name.

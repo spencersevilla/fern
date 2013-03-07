@@ -4,8 +4,9 @@ import java.util.*;
 import java.io.*;
 
 public class Response implements Serializable {
+	private int retval;
 	private FERNObject object;
-	private Request request;
+	private Message request;
 	private ArrayList<FERNObject> otherEntries;
 	public static FERNObject NULL_OBJECT = new FERNObject(new Name("NULL_OBJECT"));
 
@@ -26,11 +27,11 @@ public class Response implements Serializable {
 		return object;
 	}
 
-	public void setRequest(Request r) {
+	public void setRequest(Message r) {
 		request = r;
 	}
 
-	public Request getRequest() {
+	public Message getRequest() {
 		return request;
 	}
 
