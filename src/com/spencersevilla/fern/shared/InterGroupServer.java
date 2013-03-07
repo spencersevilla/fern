@@ -430,7 +430,7 @@ class InterGroupThread extends Thread {
 			return Rcode.NOTIMP;
 		}
 
-		Response resp = mdns.resolveService(request);
+		Response resp = mdns.resolveMessage(request);
 		if (resp == null) {
 			return Rcode.NXDOMAIN;
 		}

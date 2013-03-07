@@ -9,6 +9,7 @@ import java.rmi.Naming;
  *  PUBLIC API IS AS FOLLOWS:
  *  FERNInterface() throws Exception;
  *  Response resolveRequest(Request request);
+ *  Response register(Registration registration);
  *  int registerService(Service service);
  *  int removeService(Service service);
  *  int createGroup(Name group_name, int gid, ArrayList<String> args);
@@ -27,6 +28,15 @@ public class FERNInterface {
     public Response resolveRequest(Request request) {
         try {
             return obj.resolveRequest(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Response register(Registration registration) {
+        try {
+            return obj.register(registration);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

@@ -205,9 +205,9 @@ public class FERNManager {
 		return 0;
 	}
 
-	public Response resolveService(Request request) {
-		return resolveMessage(request);
-	}
+	// public Response resolveService(Request request) {
+	// 	return resolveMessage(request);
+	// }
 
 	public Response resolveMessage(Message message) {
 		System.out.println("FERNManager processing message: " + message);

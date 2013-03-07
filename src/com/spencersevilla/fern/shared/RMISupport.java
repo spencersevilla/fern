@@ -10,6 +10,7 @@ import java.rmi.registry.*;
 
 interface RMIServerIntf extends Remote {
     Response resolveRequest(Request request) throws RemoteException;
+    Response register(Registration registration) throws RemoteException;
 
     int registerService(Service service) throws RemoteException;
     int removeService(Service service) throws RemoteException;
@@ -49,7 +50,11 @@ class RMIServer extends UnicastRemoteObject implements RMIServerIntf {
     }
 
     public Response resolveRequest(Request request) {
-        return manager.resolveService(request);
+        return manager.resolveMessage(request);
+    }
+
+    public Response register(Registration registration) {
+        return manager.resolveMessage(registration);
     }
 
     public int registerService(Service service) {
