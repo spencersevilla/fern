@@ -444,9 +444,11 @@ class InterGroupThread extends Thread {
 		}
 
 		Response resp = mdns.resolveMessage(request);
+
 		if (resp == null) {
 			return Rcode.NXDOMAIN;
 		}
+		resp.pp();
 
 		if (resp.getObject().equals(Response.NULL_OBJECT)) {
 			return Rcode.NXDOMAIN;
