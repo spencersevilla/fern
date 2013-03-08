@@ -115,6 +115,19 @@ public class InterGroupServer implements Runnable {
 		}
 	}
 	
+	public static Name fromDNSName(org.xbill.DNS.Name n) {
+		return new Name(n.toString());
+	}
+
+	public static org.xbill.DNS.Record toDNSRecord(Record r) {
+		return org.xbill.DNS.Record.newRecord(InterGroupServer.toDNSName(r.getName()), r.getType(), r.getDClass(), r.getTTL(), r.getData());
+	}
+
+	public static Record fromDNSRecord(org.xbill.DNS.Record r) {
+		Name n = InterGroupServer.fromDNSName(r.getName());
+		return new Record(n, r.getType(), r.getDClass(), r.getTTL(), r.rdataToWireCanonical());
+	}
+
 	public static Response sendMessage(Message message, InetAddress addr, int port) {
 		try {
 			byte[] sendbuf = generateDNSMessage(message);
@@ -186,7 +199,7 @@ public class InterGroupServer implements Runnable {
 		Name name = registration.getName();
 		org.xbill.DNS.Name n = InterGroupServer.toDNSName(name);
 		org.xbill.DNS.Message message = org.xbill.DNS.Message.newUpdate(n);
-		org.xbill.DNS.Record dns_rec = registration.getRecord().toDNSRecord();
+		org.xbill.DNS.Record dns_rec =  InterGroupServer.toDNSRecord(registration.getRecord());
 		message.addRecord(dns_rec, Section.UPDATE);
 
 		return message.toWire();
@@ -268,7 +281,7 @@ public class InterGroupServer implements Runnable {
 		ArrayList<FERNObject> objects = new ArrayList<FERNObject>();
 
 outer:	for(int i = 0; i < records.length; i++) {
-			Record rec = new Record(records[i]);
+			Record rec = InterGroupServer.fromDNSRecord(records[i]);
 inner:		for (FERNObject obj : objects) {
 				if (rec.getName().equals(obj.getName())) {
 					obj.addRecord(rec);
@@ -440,7 +453,7 @@ class InterGroupThread extends Thread {
 		}
 
 		for (Record fern_rec : resp.getObject().getRecordSet()) {
-			org.xbill.DNS.Record rec = fern_rec.toDNSRecord();
+			org.xbill.DNS.Record rec = InterGroupServer.toDNSRecord(fern_rec);
 			RRset rset = new RRset(rec);
 
 
@@ -450,7 +463,7 @@ class InterGroupThread extends Thread {
 
 		for (FERNObject obj : resp.getOtherEntries()) {
 			for (Record fern_rec : obj.getRecordSet()) {
-				org.xbill.DNS.Record rec = fern_rec.toDNSRecord();
+				org.xbill.DNS.Record rec = InterGroupServer.toDNSRecord(fern_rec);
 				RRset rset = new RRset(rec);
 				addRRset(InterGroupServer.toDNSName(obj.name), response, rset, Section.ANSWER, flags);
 			}

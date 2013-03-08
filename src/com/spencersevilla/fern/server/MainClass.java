@@ -89,15 +89,6 @@ public class MainClass implements Daemon, DaemonUserSignal {
 		System.out.println("signal called!");
 	}
 
-	public static void testName() {
-		Name a = new Name("a.b.c");
-		Name b = new Name("a.b.c");
-		Name c = new Name("c.d.e");
-		System.out.println("EQUALS: A.B.C == A.B.C ? " + a.equals(b));
-		System.out.println("getParent a.b.c. = " + a.getParent());
-		System.out.println("firstTerm a.b.c. = " + a.firstTerm());
-	}
-
 	public static void testScore() {
 		System.out.println("SCORE TESTER::");
 		Request req = new Request("ccrg-server.ucsc");
