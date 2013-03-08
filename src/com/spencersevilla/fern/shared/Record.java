@@ -13,14 +13,6 @@ public class Record implements Serializable {
 
 	private final String TAB = new String("\t");
 
-	public Record(org.xbill.DNS.Record r) {
-		name = new Name(r.getName().toString());
-		type = r.getType();
-		dclass = r.getDClass();
-		ttl = r.getTTL();
-		data = r.rdataToWireCanonical();
-	}
-
 	public Record(Name n, int t, int d, long tt, byte[] dat) {
 		name = n;
 		type = t;
@@ -67,7 +59,7 @@ public class Record implements Serializable {
 
 	private String dataString() {
 		if (type == Type.A) {
-			return org.xbill.DNS.Address.toDottedQuad(data);
+			return Record.toDottedQuad(data);
 		} else if (type == Type.NS) {
 			return new String(data);
 		} else if (type == Type.TXT) {
@@ -77,7 +69,8 @@ public class Record implements Serializable {
 		}
 	}
 
-	public org.xbill.DNS.Record toDNSRecord(){
-		return org.xbill.DNS.Record.newRecord(InterGroupServer.toDNSName(name), type, dclass, ttl, data);
+	public static String toDottedQuad(byte [] addr) {
+		return ((addr[0] & 0xFF) + "." + (addr[1] & 0xFF) + "." +
+			(addr[2] & 0xFF) + "." + (addr[3] & 0xFF));
 	}
 }

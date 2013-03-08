@@ -18,6 +18,7 @@
 	<target name="clean">
 		<delete dir="${build.dir}"/>
 		<delete dir="${jar.dir}"/>
+		<delete file="${utils.dir}/FERNInterface.jar"/>
 	</target>
 
 	<target name="compile">
