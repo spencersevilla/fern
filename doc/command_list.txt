@@ -1,0 +1,21 @@
+COMMAND LINE INTERFACE PARSER:
+
+SERVICE CREATE {servicename}
+SERVICE REMOVE {servicename}
+
+GROUP TOP {gid} {name} {args}
+GROUP SUB {parent_name} {gid} {name} {args}
+GROUP LEAVE {name}
+
+parent_name must be full (ie ucsc.global)
+in SUB, name must be unqualified (ie ccrg)
+in TOP and LEAVE, name must be full (ccrg.ucsc.global)
+gid = {1 : ChordGroup, 2 : ServerGroup}
+
+ServerGroup args:
+create {port} [my_address]
+join {server_address} {port} [my_address]
+
+ChordGroup args:
+create {my_address} {port}
+join {other_address} {other_port} {my_address} {my_port}
