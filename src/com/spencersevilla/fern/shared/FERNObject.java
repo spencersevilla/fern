@@ -62,8 +62,17 @@ public class FERNObject implements Serializable {
 		// copy over the record-set. Note that the names must be null
 		// since they came from a Service (unqualified Name)...
 		for (Record r : service.getRecordSet()) {
-			Record rec = new Record(name, r.getType(), r.getDClass(), r.getTTL(), r.getData());
-			addRecord(rec);
+			// the LOCALHOST record indicates that we never specified an address for
+			// this record/host, so what we do is just ask the group for an address.
+			// This is because different groups could be on different subnets, no reason
+			// to give an incorrect or unreachable address. This is essentially NAT!
+			if (r.equals(Record.LOCALHOST)) {
+				Record rec = new Record(name, Type.A, DClass.IN, 0, group.getAddr().getAddress());
+				addRecord(rec);
+			} else {
+				Record rec = new Record(name, r.getType(), r.getDClass(), r.getTTL(), r.getData());
+				addRecord(rec);
+			}
 		}
 	}
 
