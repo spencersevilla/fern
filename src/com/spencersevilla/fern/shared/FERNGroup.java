@@ -11,6 +11,7 @@ public abstract class FERNGroup extends FERNObject {
 	protected FERNManager mdns;
 	public boolean recursive;
 	public FERNGroup parent;
+	protected InetAddress addr;
 	
 // These functions are SPECIFIC to FERNGroup and may NOT be overridden by another class
 // ======================================================================================
@@ -177,17 +178,30 @@ public abstract class FERNGroup extends FERNObject {
 // These functions MAY be overridden but are provided for ease-of-use in development
 // ======================================================================================
 
-	// for BootstrapServer
-	protected String getResponse() {
-		return null;
+	public void setAddr(InetAddress a) {
+		addr = a;
 	}
+
+	public InetAddress getAddr() {
+		if (addr == null) {
+			System.out.println(name + " WARNING: addr not set!!!");
+			return Service.generateAddress();
+		}
+
+		return addr;
+	}
+
+	// for BootstrapServer
+	// protected String getResponse() {
+	// 	return null;
+	// }
 	
 	public boolean joinGroup() {
 		// no work really necessary here?
 		start();
 		return true;
 	}
-	
+
 	// cleanup method
 	public void exit() {
 		System.out.println("exiting group: " + name);

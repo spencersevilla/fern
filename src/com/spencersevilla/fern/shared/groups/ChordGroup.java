@@ -19,7 +19,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 	private Thread thread;
 	private Chord chord;
 	private boolean running;
-	public InetAddress laddr = null;
+	public InetAddress addr = null;
 	public int lport = 0;
 	public InetAddress daddr = null;
 	public int dport = 0;
@@ -59,7 +59,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 			}
 
 			try {
-				laddr = InetAddress.getByName(nameArgs.get(1));
+				addr = InetAddress.getByName(nameArgs.get(1));
 			} catch (Exception e) {
 				System.err.println("CG " + name + " init error: invalid address!");
 				return;
@@ -75,7 +75,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 
 			try {
 				daddr = InetAddress.getByName(nameArgs.get(1));
-				laddr = InetAddress.getByName(nameArgs.get(3));
+				addr = InetAddress.getByName(nameArgs.get(3));
 			} catch (Exception e) {
 				System.err.println("CG " + name + " init error: invalid address!");
 				return;
@@ -91,7 +91,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 	}
 
 	public void run() {
-		if (laddr == null) {
+		if (addr == null) {
 				System.err.println("CG " + name + " start: no IP address?");
 				return;
 		}
@@ -115,7 +115,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 	// 	}
 
 	// 	Service s = new Service(name, 1000, mdns);
-	// 	s.addr = laddr;
+	// 	s.addr = addr;
 	// 	StringKey key = new StringKey(s.name);		
 	// 	Set set;
 		
@@ -264,7 +264,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 		URL localURL = null;
 		
 		try {
-			localURL = new URL(protocol + "://" + laddr.getHostAddress() + ":" + lport + "/");
+			localURL = new URL(protocol + "://" + addr.getHostAddress() + ":" + lport + "/");
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
@@ -276,7 +276,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 			throw new RuntimeException("CG " + name + " error: could not create", e);
 		}
 		
-		System.out.println("CG " + name + ": created chord, serving at " + laddr + ":"+ lport);
+		System.out.println("CG " + name + ": created chord, serving at " + addr + ":"+ lport);
 
 		// WE created a chord that's not top-level! register ourself as the 
 		// "parent" of this group since, presumably, we are a member of the
@@ -299,7 +299,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 		}
 				
 		try {
-			localURL = new URL(protocol + "://" + laddr.getHostAddress() + ":" + lport + "/");
+			localURL = new URL(protocol + "://" + addr.getHostAddress() + ":" + lport + "/");
 			joinURL = new URL(protocol + "://" + daddr.getHostAddress() + ":" + dport +"/");
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
@@ -312,7 +312,7 @@ public class ChordGroup extends FERNGroup implements Runnable {
 			throw new RuntimeException("CG " + name + " error: could not join!", e);
 		}
 		
-		System.out.println("CG " + name + ": joined chord at " + daddr + ":" + dport + ", serving at " + laddr + ":" + lport);
+		System.out.println("CG " + name + ": joined chord at " + daddr + ":" + dport + ", serving at " + addr + ":" + lport);
 
 		// We joined a Chord but we're ALSO a member of its parent-group,
 		// so go ahead and add ourselves to the key "parent" :-)

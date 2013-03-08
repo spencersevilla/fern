@@ -7,15 +7,27 @@ import java.util.*;
 
 public class ServerGroupClient extends ServerGroup implements Runnable {
 	private FERNObject server;
+	// client address (addr) IS NOT server address (saddr)!!!
+	private InetAddress saddr;
 
-	public ServerGroupClient(FERNManager m, Name n, InetAddress a, int p) {
-			super(m, n, a, p);
+	public ServerGroupClient(FERNManager m, Name n, InetAddress a, int p, InetAddress myaddr) {
+		super(m, n, ServerGroupClient.myAddr(myaddr), p);
+		saddr = a;
+	}
+
+	private static InetAddress myAddr(InetAddress addr) {
+		// WHAT IS MY CLIENT-ADDRESS?!?!?!?!
+		if (addr == null) {
+			System.out.println("SGC WARNING: GENERATING ADDRESS!");
+			addr = Service.generateAddress();
+		}
+		return addr;
 	}
 
 	public void start() {
-		System.out.println("SGClient " + name + ": starting-up");
+		System.out.println("SGC " + name + ": starting-up");
 		server = new FERNObject(name);
-		Record r = new Record(name, Type.A, DClass.IN, 0, addr.getAddress());
+		Record r = new Record(name, Type.A, DClass.IN, 0, saddr.getAddress());
 		server.addRecord(r);
 		return;
 	}
@@ -31,7 +43,7 @@ public class ServerGroupClient extends ServerGroup implements Runnable {
 
 	public void registerObject(FERNObject object) {
 		try {
-			Socket client = new Socket(addr, port);
+			Socket client = new Socket(saddr, port);
 
 			// ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 			ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
@@ -54,7 +66,7 @@ public class ServerGroupClient extends ServerGroup implements Runnable {
 
 	public void removeObject(FERNObject object) {
 		try {
-			Socket client = new Socket(addr, port);
+			Socket client = new Socket(saddr, port);
 
 			// ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 			ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
