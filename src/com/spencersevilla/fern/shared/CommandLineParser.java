@@ -21,6 +21,7 @@ public class CommandLineParser {
 	    		String str = st.nextToken();
 	    		Name servicename = new Name(str);
 	    		Service serv = new Service(servicename);
+	    		serv.addRecord(Record.LOCALHOST);
 
 				if (command.equals("CREATE")) {
 	    			fern.registerService(serv);
