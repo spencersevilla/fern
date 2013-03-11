@@ -6,7 +6,7 @@ import java.io.*;
 public class Record implements Serializable {
 	public static final String HEADER = String.format("%-25s%-10s%-10s%-10s%-10s", "NAME", "TYPE", "CLASS", "TTL", "DATA");
 	private static final byte[] ZEROES = new byte[]{0,0,0,0};
-	public static final Record LOCALHOST = new Record(new Name("LOCALHOST"), Type.A, DClass.IN, 0, ZEROES);
+	public static final Record LOCALHOST = new Record(Name.LOCALHOST, Type.A, DClass.IN, 0, ZEROES);
 
 	private Name name;
 	private int type, dclass;
@@ -40,13 +40,18 @@ public class Record implements Serializable {
 		Record that = (Record) otherObject;
 		
 		// other fields easy to compare. Note that we do NOT compare TTL here.
-		if (type != that.getType() || dclass != that.getDClass() || !name.equals(that.getName()))
+		if (type != that.getType() || dclass != that.getDClass())
 			return false;
 
 		// traps for null-cases
 		byte[] array1 = getData();
 		byte[] array2 = that.getData();
-		return Arrays.equals(array1, array2);
+		if (!Arrays.equals(array1, array2)) {
+			return false;
+		}
+
+		// need to compare name specially to check for null-case...
+		return name == null ? that.name == null : name.equals(that.name);
 	}
 
 
