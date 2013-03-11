@@ -159,19 +159,27 @@ public abstract class FERNGroup extends FERNObject {
 	public final Response forwardMessage(Message message) {
 		FERNObject o = readMessage(message);
 
-		// we got all the way to the end, but something doesn't exist!
+		// this code should never be called! use NO_MATCH instead...
 		if (o == null) {
-			Response r = new Response(null);
+			System.out.println("ERROR: readMessage should NEVER return null!!!");
+			return null;
+		}
+
+		// we got to the end and there's no match!
+		if (o.equals(FERNObject.NO_MATCH)) {
+			Response r = new Response(o);
 			r.setRequest(message);
 			return r;
 		}
 
+		// we got to the end and we're done!
 		if (o.isExactMatch(message)) {
 			Response r = new Response(o);
 			r.setRequest(message);
 			return r;
 		}
 
+		// we have the next-hop but we're not finished, so forward!
 		return o.forwardMessage(message);
 	}
 
@@ -242,6 +250,6 @@ public abstract class FERNGroup extends FERNObject {
 	public abstract void stop();
 	public abstract void registerObject(FERNObject o);
 	public abstract void removeObject(FERNObject o);
-	// this must be either (a) the requested object or (b) the next-hop group
+	// this must be (a) the requested object (b) the next-hop group or (c) FERNObject.NO_MATCH.
 	public abstract FERNObject resolveName(Request request);
 }

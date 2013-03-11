@@ -448,9 +448,9 @@ class InterGroupThread extends Thread {
 		if (resp == null) {
 			return Rcode.NXDOMAIN;
 		}
-		resp.pp();
+		// resp.pp();
 
-		if (resp.getObject().equals(Response.NULL_OBJECT)) {
+		if (resp.getObject().equals(FERNObject.NO_MATCH)) {
 			return Rcode.NXDOMAIN;
 		}
 

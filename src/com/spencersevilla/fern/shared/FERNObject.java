@@ -7,6 +7,7 @@ import java.net.InetAddress;
 public class FERNObject implements Serializable {
 	protected Name name;
 	private ArrayList<Record> recordSet;
+	public static final FERNObject NO_MATCH = new FERNObject(Name.NO_MATCH);
 
 	public FERNObject(Name n) {
 		n.terminate();

@@ -8,6 +8,7 @@ public class Name implements Serializable {
 	private String[] nameArray;
 	private int length;
 	public static final Name LOCALHOST = new Name("LOCALHOST");
+	public static final Name NO_MATCH = new Name("NO_MATCH");
 
 	public Name(String n) {
 		if (n == null) {

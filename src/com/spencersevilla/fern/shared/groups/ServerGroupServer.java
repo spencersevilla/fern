@@ -68,8 +68,10 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		// Object not found
 		if (o == null) {
 			System.out.println("SG " + name + ": no result for " + key);
+			return FERNObject.NO_MATCH;
 		}
 
+		// Object found!
 		return o;
 	}
 
