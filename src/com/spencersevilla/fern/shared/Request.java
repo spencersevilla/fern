@@ -20,4 +20,8 @@ public class Request extends Message implements Serializable {
 		// NO type-checking here???
 		type = x;
 	}
+
+	public int getType() {
+		return type;
+	}
 }

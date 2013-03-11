@@ -27,8 +27,19 @@ public class Response implements Serializable {
 		return object;
 	}
 
+	// THIS SHOULD ONLY BE CALLED ONCE!!!
 	public void setRequest(Message r) {
+		if (request != null) {
+			System.out.println("ERROR: setRequest called multiple times on Response " + this);
+			return;
+		}
+
 		request = r;
+		if (request instanceof Request) {
+			Request req = (Request) request;
+			int type = req.getType();
+			filterRecordType(type);
+		}
 	}
 
 	public Message getRequest() {
@@ -41,6 +52,19 @@ public class Response implements Serializable {
 
 	public ArrayList<FERNObject> getOtherEntries() {
 		return otherEntries;
+	}
+
+	private void filterRecordType(int type) {
+		if (request == null) {
+			System.out.println("ERROR: filterType called without a request set!");
+		}
+
+		if (object == null) {
+			System.out.println("ERROR: filterType called without an object set!");
+		}
+
+		object.filterRecordType(type);
+		return;
 	}
 
 	public void pp() {

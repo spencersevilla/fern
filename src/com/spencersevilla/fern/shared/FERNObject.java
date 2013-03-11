@@ -55,6 +55,20 @@ public class FERNObject implements Serializable {
 		recordSet.add(r);
 	}
 	
+	public void filterRecordType(int type) {
+		if (type == Type.ANY) {
+			return;
+		}
+
+		Iterator itr = recordSet.iterator();
+		while (itr.hasNext()) {
+			Record r = (Record) itr.next();
+			if (r.getType() != type) {
+				itr.remove();
+			}
+		}
+	}
+
 	// this is an awkward function that appends a servicename to
 	// the end of a FERNGroup name to create a fully-qualified FERN object.
 	public FERNObject(Service service, FERNGroup group) {
