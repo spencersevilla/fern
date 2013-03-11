@@ -34,7 +34,7 @@ public class Service implements Serializable {
 	}
 
 	public void addRecord(Record r) {
-		if (r.getName() != null) {
+		if (r.getName() != null && !r.getName().equals(Name.LOCALHOST)) {
 			System.out.println("ERROR: record cannot have a name!");
 			return;
 		}

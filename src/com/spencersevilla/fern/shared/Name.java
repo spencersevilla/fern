@@ -7,6 +7,7 @@ public class Name implements Serializable {
 	private String name;
 	private String[] nameArray;
 	private int length;
+	public static final Name LOCALHOST = new Name("LOCALHOST");
 
 	public Name(String n) {
 		if (n == null) {
