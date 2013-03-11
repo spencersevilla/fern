@@ -8,9 +8,16 @@ public class Request extends Message implements Serializable {
 
 	public Request(String n) {
 		super(n);
+		type = Type.ANY;
 	}
 
 	public Request(Name n) {
 		super(n);
+		type = Type.ANY;
+	}
+
+	public void setType(int x) {
+		// NO type-checking here???
+		type = x;
 	}
 }
