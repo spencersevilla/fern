@@ -27,6 +27,10 @@ public class Response implements Serializable {
 		return object;
 	}
 
+	public int getRetVal() {
+		return retval;
+	}
+
 	// THIS SHOULD ONLY BE CALLED ONCE!!!
 	public void setRequest(Message r) {
 		if (request != null) {

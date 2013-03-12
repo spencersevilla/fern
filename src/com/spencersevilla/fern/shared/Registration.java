@@ -12,6 +12,10 @@ public class Registration extends Message implements Serializable {
 		record = new Record(r);
 	}
 
+	public Registration(Record r) {
+		this(r.getName(), r);
+	}
+
 	public Record getRecord() {
 		return new Record(record);
 	}
