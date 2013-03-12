@@ -237,7 +237,7 @@ public abstract class FERNGroup extends FERNObject {
 		// only message-type that *MUST* be supported...
 		if (message instanceof Request) {
 			Request req = (Request) message;
-			resolveName(req);
+			return resolveName(req);
 		}
 		return null;
 	}
