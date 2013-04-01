@@ -70,7 +70,7 @@
 	</target>
 
 <!-- ALIASES HERE FOR QUICK COMPILATION/RUNNING/TESTING -->
-	<target name="run" depends="clean, run-main" />
+	<target name="run" depends="run-main" />
 
 	<target name="main" depends="clean, jar-main" />
 	<target name="interface" depends="clean, jar-interface" />

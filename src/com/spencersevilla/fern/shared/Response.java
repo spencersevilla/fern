@@ -6,9 +6,13 @@ import java.io.*;
 public class Response implements Serializable {
 	private int retval;
 	private FERNObject object;
-	private Message request;
+	private Message message;
 	private ArrayList<FERNObject> otherEntries;
 	public static FERNObject NULL_OBJECT = new FERNObject(new Name("NULL_OBJECT"));
+
+	public Response(Message m) {
+		message = m;
+	}
 
 	public Response(FERNObject o) {
 		if (o == null) {
@@ -27,27 +31,30 @@ public class Response implements Serializable {
 		return object;
 	}
 
+	public void setRetVal(int val) {
+		retval = val;
+	}
 	public int getRetVal() {
 		return retval;
 	}
 
 	// THIS SHOULD ONLY BE CALLED ONCE!!!
 	public void setRequest(Message r) {
-		if (request != null) {
+		if (message != null) {
 			System.out.println("ERROR: setRequest called multiple times on Response " + this);
 			return;
 		}
 
-		request = r;
-		if (request instanceof Request) {
-			Request req = (Request) request;
+		message = r;
+		if (message instanceof Request) {
+			Request req = (Request) message;
 			int type = req.getType();
 			filterRecordType(type);
 		}
 	}
 
 	public Message getRequest() {
-		return request;
+		return message;
 	}
 
 	public void addOtherEntry(FERNObject o) {
@@ -59,7 +66,7 @@ public class Response implements Serializable {
 	}
 
 	private void filterRecordType(int type) {
-		if (request == null) {
+		if (message == null) {
 			System.out.println("ERROR: filterType called without a request set!");
 		}
 
@@ -72,7 +79,7 @@ public class Response implements Serializable {
 	}
 
 	public void pp() {
-		System.out.println("Request: " + request);
+		System.out.println("Request: " + message);
 		System.out.println("Returned Object Name: " + object);
 		System.out.println("Records: ");
 		System.out.println(Record.HEADER);

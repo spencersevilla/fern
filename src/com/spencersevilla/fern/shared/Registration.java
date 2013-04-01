@@ -19,4 +19,14 @@ public class Registration extends Message implements Serializable {
 	public Record getRecord() {
 		return new Record(record);
 	}
+
+	public static Response successfulResponse(Registration reg) {
+		Response ret = new Response(reg);
+		int retval = 0;
+	}
+
+	public static Response unsuccessfulResponse(Registration reg) {
+		Response ret = new Response(reg);
+		int retval = 5;
+	}
 }
