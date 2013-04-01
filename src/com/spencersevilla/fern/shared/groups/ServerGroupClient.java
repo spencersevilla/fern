@@ -41,7 +41,27 @@ public class ServerGroupClient extends ServerGroup implements Runnable {
 		return;
 	}
 
-	public void registerObject(FERNObject object) {
+	// we overload this function because, honestly, all we'll ever do
+	// is forward this message to the server no-matter-what!
+	public Response forwardMessage(Message message) {
+		return server.forwardMessage(message);
+	}
+
+	public abstract Response parseMessage(Message message) {
+		System.err.println("ERROR: how did SGC.parseMessage get called???");
+		Exception e = new Exception();
+		e.printStackTrace();
+		return null;
+	}
+
+	public abstract FERNObject getNextHop(Message message) {
+		System.err.println("ERROR: how did SGC.getNextHop get called???");
+		Exception e = new Exception();
+		e.printStackTrace();
+		return null;
+	}
+
+	public FERNObject registerObject(FERNObject object) {
 		try {
 			Socket client = new Socket(saddr, port);
 

@@ -155,33 +155,6 @@ public abstract class FERNGroup extends FERNObject {
 
 		return new Name(querygroups[groups.length]);
 	}
-	
-	public final Response forwardMessage(Message message) {
-		FERNObject o = readMessage(message);
-
-		// this code should never be called! use NO_MATCH instead...
-		if (o == null) {
-			System.out.println("ERROR: readMessage should NEVER return null!!!");
-			return null;
-		}
-
-		// we got to the end and there's no match!
-		if (o.equals(FERNObject.NO_MATCH)) {
-			Response r = new Response(o);
-			r.setRequest(message);
-			return r;
-		}
-
-		// we got to the end and we're done!
-		if (o.isExactMatch(message)) {
-			Response r = new Response(o);
-			r.setRequest(message);
-			return r;
-		}
-
-		// we have the next-hop but we're not finished, so forward!
-		return o.forwardMessage(message);
-	}
 
 // These functions MAY be overridden but are provided for ease-of-use in development
 // ======================================================================================
@@ -233,14 +206,75 @@ public abstract class FERNGroup extends FERNObject {
 		removeObject(group);
 	}
 
-	public FERNObject readMessage(Message message) {
-		// only message-type that *MUST* be supported...
-		if (message instanceof Request) {
-			Request req = (Request) message;
-			return resolveName(req);
+	// this function is a MAIN entry-point for FERNGroups. It takes as input
+	// a Message and returns the appropriate response (AFTER all recusion +
+	// forwarding is completed as necessary.)
+
+	// LOGIC: first, are we in the end-group or not?
+	// if we are, then parse the message and generate a (new) response.
+	// if not, all we have to do is find the next-hop and return forwardMessage!
+	public Response forwardMessage(Message message) {
+		if (isFinalGroup(message)) {
+			return parseMessage(message);
+		} else {
+			FERNObject o = getNextHop(message);
+			return o.forwardMessage(message);
 		}
-		return null;
 	}
+
+	public boolean isFinalGroup(Message message) {
+		Name parent_name = message.getName.getParent();
+		Message parent_message = new Message(parent_name);
+		return isExactMatch(parent_message);
+	}
+
+	public abstract Response parseMessage(Message message);
+	public abstract FERNObject getNextHop(Message message);
+
+	// 	FERNObject o = readMessage(message);
+
+	// 	// this code should never be called! use NO_MATCH instead...
+	// 	if (o == null) {
+	// 		System.out.println("ERROR: readMessage should NEVER return null!!!");
+	// 		return null;
+	// 	}
+
+	// 	// we got to the end and there's no match!
+	// 	if (o.equals(FERNObject.NO_MATCH)) {
+	// 		Response r = new Response(o);
+	// 		r.setRequest(message);
+	// 		return r;
+	// 	}
+
+	// 	// we got to the end and we're done!
+	// 	if (o.isExactMatch(message)) {
+	// 		Response r = new Response(o);
+	// 		r.setRequest(message);
+	// 		return r;
+	// 	}
+
+	// 	// we have the next-hop but we're not finished, so forward!
+	// 	return o.forwardMessage(message);
+	// }
+
+	// the "owner" of a record is always its parent-group, so if we
+	// "trim" the last name off of the message, it should be an exact-match.
+
+
+	// public FERNObject readMessage(Message message) {
+	// 	// only message-type that really *MUST* be supported...
+	// 	if (message instanceof Request) {
+	// 		Request req = (Request) message;
+	// 		return resolveName(req);
+
+	// 	// let's also give them a default registration method...
+	// 	} else if (message instanceof Registration) {
+	// 		Registration reg = (Registration) message;
+	// 		FERNObject o = new FERNObject(reg.getName());
+	// 		o.addRecord(reg.getRecord());
+	// 		return registerObject(o);
+	// 	}
+	// }
 
 // These functions MUST be overridden: they provide the core FERNGroup functionality!
 // ======================================================================================
@@ -248,8 +282,8 @@ public abstract class FERNGroup extends FERNObject {
 	public abstract int getId();
 	public abstract void start();
 	public abstract void stop();
-	public abstract void registerObject(FERNObject o);
-	public abstract void removeObject(FERNObject o);
-	// this must be (a) the requested object (b) the next-hop group or (c) FERNObject.NO_MATCH.
+	// these must return (a) the requested object (b) the next-hop group or (c) FERNObject.NO_MATCH.
 	public abstract FERNObject resolveName(Request request);
+	public abstract FERNObject registerObject(FERNObject o);
+	public abstract void removeObject(FERNObject o);
 }

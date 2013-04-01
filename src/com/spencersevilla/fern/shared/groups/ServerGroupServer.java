@@ -24,6 +24,73 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		return;
 	}
 
+	public Response parseMessage(Message message) {
+		// here we know that this group is the final-destination!
+		if (message instanceof Request) {
+			return parseRequest((Request) message);
+		} else if (message instanceof Registration) {
+			return parseRegistration((Registration) message);
+		}
+	}
+
+	public FERNObject getNextHop(Message message) {
+		Name key = findNextHop(message);
+		if (key == null) {
+			System.out.println("SG " + name + " error: invalid findNextHop for message " + message);
+			return null;
+		}
+
+		FERNObject o = objects.get(key);
+
+		// Object not found
+		if (o == null) {
+			System.out.println("SG " + name + " ERROR: no result for " + key);
+		}
+		return o;
+	}
+
+
+	public Response parseRequest(Request request) {
+		Name key = findNextHop(request);
+		if (key == null) {
+			System.out.println("SG " + name + " error: invalid findNextHop for request " + request);
+			return null;
+		}
+
+		FERNObject o = objects.get(key);
+
+		// Object not found
+		if (o == null) {
+			System.out.println("SG " + name + ": no result for " + key);
+			o = FERNObject.NO_MATCH;
+		}
+
+		// Now we're guaranteed to have an object!
+		Response resp = new Response(o);
+		resp.setRequest(request);
+		return resp;
+	}
+
+	public Response parseRegistration(Registration reg) {
+		Name key = findNextHop(reg);
+		if (key == null) {
+			System.out.println("SG " + name + " error: invalid findNextHop for request " + reg);
+			return null;
+		}
+
+		FERNObject object = objects.get(key);
+		if (object != null) {
+			object.addRecord(reg.getRecord());
+		} else {
+			object = new FERNObject(reg.getRecord());
+			objects.put(key, object);
+		}
+
+		// GENERATE REGISTRATION-RESPONSE HERE!!!
+		return Registration.successfulResponse(reg);
+	}
+
+
 	public void registerObject(FERNObject object) {
 		System.out.println("SGServer " + name + " server: registering object " + object);
 		if (!object.getName().getParent().equals(name)) {
