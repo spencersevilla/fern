@@ -5,29 +5,29 @@ import java.util.*;
 import java.io.*;
 
 public class Registration extends Message implements Serializable {
-	private Record record;
+	private ArrayList<Record> recordSet;
 
-	public Registration(Name n, Record r) {
+	public Registration(Name n) {
 		super(n);
-		record = new Record(r);
+		recordSet = new ArrayList<Record>();
 	}
 
-	public Registration(Record r) {
-		this(r.getName(), r);
+	public void addRecord(Record r) {
+		recordSet.add(r);
 	}
 
 	public ArrayList<Record> getRecordSet() {
 		return null;
 	}
 
-	public static Response successfulResponse(Registration reg) {
-		Response ret = new Response(reg);
+	public static Response successfulResponse(Message m) {
+		Response ret = new Response(m);
 		ret.setRetVal(Rcode.NOERROR);
 		return ret;
 	}
 
-	public static Response unsuccessfulResponse(Registration reg) {
-		Response ret = new Response(reg);
+	public static Response unsuccessfulResponse(Message m) {
+		Response ret = new Response(m);
 		ret.setRetVal(Rcode.REFUSED);
 		return ret;
 	}

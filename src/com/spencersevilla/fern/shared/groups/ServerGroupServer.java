@@ -82,9 +82,14 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 
 		FERNObject object = objects.get(key);
 		if (object != null) {
-			object.addRecord(reg.getRecord());
+			for (Record r : reg.getRecordSet()) {
+				object.addRecord(r);
+			}
 		} else {
-			object = new FERNObject(reg.getRecord()); 
+			object = new FERNObject(reg.getName());
+			for (Record r : reg.getRecordSet()) {
+				object.addRecord(r);
+			}
 			objects.put(key, object);
 		}
 
