@@ -163,8 +163,14 @@ public final class Type {
 	/** Transport Layer Security Authentication, draft-ietf-dane-protocol-23 */
 	public static final int TLSA		= 52;
 
-	/* new content-record type for my ICND project */
+	/* SPENCER-DEFINED ICN TYPES HERE!!! =================================== */
+
 	public static final int ICN			= 56;
+	public static final int CSA			= 57;
+	public static final int CSC			= 58;
+
+	/* SPENCER-DEFINED ICN TYPES END HERE!!! =============================== */
+
 
 	/** Sender Policy Framework (experimental) */
 	public static final int SPF			= 99;
