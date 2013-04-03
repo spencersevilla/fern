@@ -97,8 +97,11 @@ public class FERNManager {
 		// update the name to reflect that it's a subgroup
 		Name fullname = name.concatenate(parent.name);
 
-		// check the parent to see if it already exists?
-		if (parent.resolveName(new Request(fullname)) != null) {
+		// first check the parent to see if it already exists!
+		Request req = new Request(fullname);
+		Response resp = parent.parseMessage(req);
+		if (resp.getRetVal() != Rcode.NXDOMAIN) {
+			// an entry already exists!
 			System.err.println("FERN error: group already exists!");
 			return null;
 		}

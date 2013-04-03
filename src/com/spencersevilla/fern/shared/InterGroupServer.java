@@ -191,7 +191,8 @@ public class InterGroupServer implements Runnable {
 	}
 
 	private static byte[] generateUpdate(Registration registration) {
-		if (registration.getRecord() == null) {
+		ArrayList<Record> recordSet = registration.getRecordSet();
+		if (recordSet.size() == 0) {
 			// nothing to update/register?
 			return null;
 		}
@@ -199,8 +200,11 @@ public class InterGroupServer implements Runnable {
 		Name name = registration.getName();
 		org.xbill.DNS.Name n = InterGroupServer.toDNSName(name);
 		org.xbill.DNS.Message message = org.xbill.DNS.Message.newUpdate(n);
-		org.xbill.DNS.Record dns_rec =  InterGroupServer.toDNSRecord(registration.getRecord());
-		message.addRecord(dns_rec, Section.UPDATE);
+
+		for (Record r : recordSet) {
+			org.xbill.DNS.Record dns_rec =  InterGroupServer.toDNSRecord(r);
+			message.addRecord(dns_rec, Section.UPDATE);
+		}
 
 		return message.toWire();
 	}
@@ -305,7 +309,7 @@ inner:		for (FERNObject obj : objects) {
 		}
 
 		if (response == null) {
-			response = new Response(null);
+			response = new Response(Response.NULL_OBJECT);
 		}
 
 		// LAST, we make sure to add the other objects and request

@@ -3,7 +3,7 @@ package com.spencersevilla.fern;
 import java.util.*;
 import java.io.*;
 
-public abstract class Message implements Serializable {
+public class Message implements Serializable {
 	protected Name name;
 
 	public Message(Name n) {
