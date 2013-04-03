@@ -70,10 +70,10 @@ public abstract class FERNGroup extends FERNObject {
 	public static final FERNGroup createGroupFromArgs(FERNManager m, Name n, int gid, ArrayList<String> args) {
 		FERNGroup group = null;
 
-		if (gid == ChordGroup.id) {
-			group = new ChordGroup(m, n, args);
-		} else if (gid == ServerGroup.id) {
+		if (gid == ServerGroup.id) {
 			group = ServerGroup.createGroupFromArgs(m, n, args);
+		// } else if (gid == ChordGroup.id) {
+		// 	group = new ChordGroup(m, n, args);
 		// } else 	if (gid == FloodGroup.id) {
 		// 	group = new FloodGroup(m, n, args);
 		} else {
@@ -223,13 +223,10 @@ public abstract class FERNGroup extends FERNObject {
 	}
 
 	public boolean isFinalGroup(Message message) {
-		Name parent_name = message.getName.getParent();
+		Name parent_name = message.getName().getParent();
 		Message parent_message = new Message(parent_name);
 		return isExactMatch(parent_message);
 	}
-
-	public abstract Response parseMessage(Message message);
-	public abstract FERNObject getNextHop(Message message);
 
 	// 	FERNObject o = readMessage(message);
 
@@ -282,8 +279,13 @@ public abstract class FERNGroup extends FERNObject {
 	public abstract int getId();
 	public abstract void start();
 	public abstract void stop();
+
+	// the MAIN functionality lies in these functions!!!
+	public abstract Response parseMessage(Message message);
+	public abstract FERNObject getNextHop(Message message);
+
 	// these must return (a) the requested object (b) the next-hop group or (c) FERNObject.NO_MATCH.
-	public abstract FERNObject resolveName(Request request);
-	public abstract FERNObject registerObject(FERNObject o);
+	// public abstract FERNObject resolveName(Request request);
+	public abstract void registerObject(FERNObject o);
 	public abstract void removeObject(FERNObject o);
 }

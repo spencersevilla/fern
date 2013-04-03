@@ -47,21 +47,21 @@ public class ServerGroupClient extends ServerGroup implements Runnable {
 		return server.forwardMessage(message);
 	}
 
-	public abstract Response parseMessage(Message message) {
+	public Response parseMessage(Message message) {
 		System.err.println("ERROR: how did SGC.parseMessage get called???");
 		Exception e = new Exception();
 		e.printStackTrace();
 		return null;
 	}
 
-	public abstract FERNObject getNextHop(Message message) {
+	public FERNObject getNextHop(Message message) {
 		System.err.println("ERROR: how did SGC.getNextHop get called???");
 		Exception e = new Exception();
 		e.printStackTrace();
 		return null;
 	}
 
-	public FERNObject registerObject(FERNObject object) {
+	public void registerObject(FERNObject object) {
 		try {
 			Socket client = new Socket(saddr, port);
 
@@ -106,7 +106,7 @@ public class ServerGroupClient extends ServerGroup implements Runnable {
 		return;
 	}
 
-	public FERNObject resolveName(Request request) {
-		return server;
-	}
+	// public FERNObject resolveName(Request request) {
+	// 	return server;
+	// }
 }

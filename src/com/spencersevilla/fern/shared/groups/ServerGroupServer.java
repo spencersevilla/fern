@@ -30,6 +30,8 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 			return parseRequest((Request) message);
 		} else if (message instanceof Registration) {
 			return parseRegistration((Registration) message);
+		} else {
+			return null;
 		}
 	}
 
@@ -82,7 +84,7 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		if (object != null) {
 			object.addRecord(reg.getRecord());
 		} else {
-			object = new FERNObject(reg.getRecord());
+			object = new FERNObject(reg.getRecord()); 
 			objects.put(key, object);
 		}
 
@@ -122,25 +124,25 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		return;
 	}
 
-	public FERNObject resolveName(Request request) {
-		// this generates a child or parent name of the group-in-question
-		Name key = findNextHop(request);
-		if (key == null) {
-			System.out.println("SG " + name + " error: invalid findNextHop?");
-			return null;
-		}
+	// public FERNObject resolveName(Request request) {
+	// 	// this generates a child or parent name of the group-in-question
+	// 	Name key = findNextHop(request);
+	// 	if (key == null) {
+	// 		System.out.println("SG " + name + " error: invalid findNextHop?");
+	// 		return null;
+	// 	}
 
-		FERNObject o = objects.get(key);
+	// 	FERNObject o = objects.get(key);
 
-		// Object not found
-		if (o == null) {
-			System.out.println("SG " + name + ": no result for " + key);
-			return FERNObject.NO_MATCH;
-		}
+	// 	// Object not found
+	// 	if (o == null) {
+	// 		System.out.println("SG " + name + ": no result for " + key);
+	// 		return FERNObject.NO_MATCH;
+	// 	}
 
-		// Object found!
-		return o;
-	}
+	// 	// Object found!
+	// 	return o;
+	// }
 
 	public void run() {
 		try {

@@ -88,5 +88,5 @@ public abstract class ServerGroup extends FERNGroup implements Runnable {
 	
 	public abstract void registerObject(FERNObject o);
 	public abstract void removeObject(FERNObject o);
-	public abstract FERNObject resolveName(Request request);
+	// public abstract FERNObject resolveName(Request request);
 }
