@@ -15,12 +15,19 @@ public class Response implements Serializable {
 	}
 
 	public Response(FERNObject o) {
+		// trap null-case
 		if (o == null) {
 			o = NULL_OBJECT;
 		}
 
+		if (o == NULL_OBJECT) {
+			retval = Rcode.NXDOMAIN; /* NXDOMAIN */
+			return;
+		}
+
 		object = new FERNObject(o);
 		otherEntries = new ArrayList<FERNObject>();
+		retval = Rcode.NOERROR;
 	}
 
 	public final String toString() {

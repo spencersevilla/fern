@@ -16,17 +16,19 @@ public class Registration extends Message implements Serializable {
 		this(r.getName(), r);
 	}
 
-	public Record getRecord() {
-		return new Record(record);
+	public ArrayList<Record> getRecordSet() {
+		return null;
 	}
 
 	public static Response successfulResponse(Registration reg) {
 		Response ret = new Response(reg);
-		int retval = 0;
+		ret.setRetVal(Rcode.NOERROR);
+		return ret;
 	}
 
 	public static Response unsuccessfulResponse(Registration reg) {
 		Response ret = new Response(reg);
-		int retval = 5;
+		ret.setRetVal(Rcode.REFUSED);
+		return ret;
 	}
 }
