@@ -55,10 +55,11 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 	public Response parseRequest(Request request) {
 		Name key = findNextHop(request);
 		if (key == null) {
-			System.out.println("SG " + name + " error: invalid findNextHop for request " + request);
+			System.out.println("SGServer " + name + " error: invalid findNextHop for request " + request);
 			return null;
 		}
 
+		System.out.println("SG KEY: " + key);
 		FERNObject o = objects.get(key);
 
 		// Object not found
@@ -106,6 +107,7 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		}
 
 		Name key = object.getName().firstTerm();
+		System.out.println("SG KEY: " + key);
 
 		if (objects.get(key) != null) {
 			System.err.println("SGServer " + name + " error: there already exists a value for " + key);
