@@ -83,8 +83,8 @@ public abstract class ServerGroup extends FERNGroup implements Runnable {
 	}
 
 	// push core functionality into implementation-classes
-	public abstract Response parseMessage(Message message);
-	public abstract FERNObject getNextHop(Message message);
+	public abstract Response parseMessageFinal(Message message);
+	public abstract Response parseMessageOther(Message message);
 	
 	public abstract void registerObject(FERNObject o);
 	public abstract void removeObject(FERNObject o);

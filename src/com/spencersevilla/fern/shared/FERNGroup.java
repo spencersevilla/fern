@@ -215,10 +215,9 @@ public abstract class FERNGroup extends FERNObject {
 	// if not, all we have to do is find the next-hop and return forwardMessage!
 	public Response forwardMessage(Message message) {
 		if (isFinalGroup(message)) {
-			return parseMessage(message);
+			return parseMessageFinal(message);
 		} else {
-			FERNObject o = getNextHop(message);
-			return o.forwardMessage(message);
+			return parseMessageOther(message);
 		}
 	}
 
@@ -281,8 +280,8 @@ public abstract class FERNGroup extends FERNObject {
 	public abstract void stop();
 
 	// the MAIN functionality lies in these functions!!!
-	public abstract Response parseMessage(Message message);
-	public abstract FERNObject getNextHop(Message message);
+	public abstract Response parseMessageFinal(Message message);
+	public abstract Response parseMessageOther(Message message);
 
 	// these must return (a) the requested object (b) the next-hop group or (c) FERNObject.NO_MATCH.
 	// public abstract FERNObject resolveName(Request request);

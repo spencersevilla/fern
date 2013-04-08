@@ -99,7 +99,7 @@ public class FERNManager {
 
 		// first check the parent to see if it already exists!
 		Request req = new Request(fullname);
-		Response resp = parent.parseMessage(req);
+		Response resp = parent.parseMessageFinal(req);
 		if (resp.getRetVal() != Rcode.NXDOMAIN) {
 			// an entry already exists!
 			System.err.println("FERN error: group already exists!");

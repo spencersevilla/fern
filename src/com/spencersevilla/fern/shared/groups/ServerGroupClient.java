@@ -42,20 +42,22 @@ public class ServerGroupClient extends ServerGroup implements Runnable {
 	}
 
 	// we overload this function because, honestly, all we'll ever do
-	// is forward this message to the server no-matter-what!
+	// is forward this message to the server no-matter-what! THIS means that
+	// the two functions below (parseMessage{Final,Other}) will never be called
+	// because this is the only entry-point for them.
 	public Response forwardMessage(Message message) {
 		return server.forwardMessage(message);
 	}
 
-	public Response parseMessage(Message message) {
-		System.err.println("ERROR: how did SGC.parseMessage get called???");
+	public Response parseMessageFinal(Message message) {
+		System.err.println("ERROR: how did SGC.parseMessageFinal get called???");
 		Exception e = new Exception();
 		e.printStackTrace();
 		return null;
 	}
 
-	public FERNObject getNextHop(Message message) {
-		System.err.println("ERROR: how did SGC.getNextHop get called???");
+	public Response parseMessageOther(Message message) {
+		System.err.println("ERROR: how did SGC.parseMessgaeOther get called???");
 		Exception e = new Exception();
 		e.printStackTrace();
 		return null;

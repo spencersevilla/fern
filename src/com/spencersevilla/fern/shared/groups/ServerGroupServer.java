@@ -24,7 +24,7 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		return;
 	}
 
-	public Response parseMessage(Message message) {
+	public Response parseMessageFinal(Message message) {
 		// here we know that this group is the final-destination!
 		if (message instanceof Request) {
 			return parseRequest((Request) message);
@@ -33,6 +33,12 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		} else {
 			return null;
 		}
+	}
+
+	// add caching here!!!
+	public Response parseMessageOther(Message message) {
+		FERNObject o = getNextHop(message);
+		return o.forwardMessage(message);
 	}
 
 	public FERNObject getNextHop(Message message) {
