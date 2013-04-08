@@ -38,7 +38,7 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 	public FERNObject getNextHop(Message message) {
 		Name key = findNextHop(message);
 		if (key == null) {
-			System.out.println("SG " + name + " error: invalid findNextHop for message " + message);
+			System.out.println("SGServer " + name + " error: invalid findNextHop for message " + message);
 			return null;
 		}
 
@@ -46,7 +46,7 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 
 		// Object not found
 		if (o == null) {
-			System.out.println("SG " + name + " ERROR: no result for " + key);
+			System.out.println("SGServer " + name + " ERROR: no result for " + key);
 		}
 		return o;
 	}
@@ -59,21 +59,11 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 			return null;
 		}
 
-		System.out.println("SG KEY: " + key);
-		for (Name n : objects.keySet()) {
-			System.out.println("KEY: " + n);
-			if (n.equals(key)) {{
-				FERNObject a = objects.get(key);
-				FERNObject b = objects.get(n);
-				System.out.println("MATCH!!! KEY GOT OBJECT " + a + " AND N GOT OBJECT " + b);
-			}}
-		}
-
 		FERNObject o = objects.get(key);
 
 		// Object not found
 		if (o == null) {
-			System.out.println("SG " + name + ": no result for " + key);
+			System.out.println("SGServer " + name + ": no result for " + key);
 			o = FERNObject.NO_MATCH;
 		}
 
@@ -86,7 +76,7 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 	public Response parseRegistration(Registration reg) {
 		Name key = findNextHop(reg);
 		if (key == null) {
-			System.out.println("SG " + name + " error: invalid findNextHop for request " + reg);
+			System.out.println("SGServer " + name + " error: invalid findNextHop for request " + reg);
 			return null;
 		}
 
@@ -116,7 +106,6 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		}
 
 		Name key = object.getName().firstTerm();
-		System.out.println("SG KEY: " + key);
 
 		if (objects.get(key) != null) {
 			System.err.println("SGServer " + name + " error: there already exists a value for " + key);
