@@ -63,7 +63,9 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		for (Name n : objects.keySet()) {
 			System.out.println("KEY: " + n);
 			if (n.equals(key)) {{
-				System.out.println("MATCH!!!");
+				FERNObject a = objects.get(key);
+				FERNObject b = objects.get(n);
+				System.out.println("MATCH!!! KEY GOT OBJECT " + a + " AND N GOT OBJECT " + b);
 			}}
 		}
 
