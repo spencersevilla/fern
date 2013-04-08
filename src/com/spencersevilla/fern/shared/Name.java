@@ -78,6 +78,10 @@ public class Name implements Serializable {
 		return this.name == null ? that.name == null : this.name.equals(that.name);
 	}
 
+	@Override public int hashCode() {
+		return this.name.hashCode();
+	}
+
 	// org.xbill.DNS.Name wrappers ============================================
 
 
