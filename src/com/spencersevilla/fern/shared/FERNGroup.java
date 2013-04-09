@@ -156,6 +156,23 @@ public abstract class FERNGroup extends FERNObject {
 		return new Name(querygroups[groups.length]);
 	}
 
+	protected final Name findNextHopFull(Message message) {
+		Name sname = findNextHop(message);
+
+		// error: we can't get a match at all!
+		if (sname == null) {
+			return null;
+		}
+
+		if (sname.equals(PARENT_NAME)) {
+			// we just need the name of the parent of the group we're in
+			return name.getParent();
+		}
+
+		// the sname should just be APPENDED to the groupname!
+		return sname.concatenate(name);
+	}
+
 // These functions MAY be overridden but are provided for ease-of-use in development
 // ======================================================================================
 
