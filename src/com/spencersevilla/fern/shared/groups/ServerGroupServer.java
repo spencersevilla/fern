@@ -7,10 +7,12 @@ import java.util.*;
 
 public class ServerGroupServer extends ServerGroup implements Runnable {
 	private HashMap<Name, FERNObject> objects;
+	private ArrayList<FERNObject> cacheList;
 
 	public ServerGroupServer(FERNManager m, Name n, InetAddress a, int p) {
 			super(m, n, a, p);
 			objects = new HashMap<Name, FERNObject>();
+			cacheList = new ArrayList<FERNObject>();
 	}
 
 	public void start() {
@@ -35,10 +37,23 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		}
 	}
 
-	// add caching here!!!
 	public Response parseMessageOther(Message message) {
-		FERNObject o = getNextHop(message);
-		return o.forwardMessage(message);
+
+		FERNObject initialObject = getNextHop(message);
+
+		// Since the tree is deterministic, we already know the next hop. Now
+		// let's go fishing in the cache and see if we can beat it!
+		FERNObject obj = findBestMatch(message, cacheList, initialObject);
+
+		// if this is an exact match AND we allow it, we can respond directly
+		if (message.allowCacheResponse() && obj.isExactMatch(message)) {
+			Response r = new Response(obj);
+			r.setRequest(message);
+			return r;
+		}
+
+		// can't respond directly, so let's forward the message onwards.
+		return obj.forwardMessage(message);
 	}
 
 	public FERNObject getNextHop(Message message) {
