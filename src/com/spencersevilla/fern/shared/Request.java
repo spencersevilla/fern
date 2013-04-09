@@ -16,6 +16,10 @@ public class Request extends Message implements Serializable {
 		type = Type.ANY;
 	}
 
+	public boolean allowCacheResponse() {
+		return true;
+	}
+
 	public void setType(int x) {
 		// NO type-checking here???
 		type = x;

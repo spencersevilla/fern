@@ -21,4 +21,8 @@ public class Message implements Serializable {
 	public Name getName() {
 		return new Name(name);
 	}
+
+	public boolean allowCacheResponse() {
+		return false;
+	}
 }
