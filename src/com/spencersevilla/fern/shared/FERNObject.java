@@ -222,6 +222,11 @@ public class FERNObject implements Serializable {
 			highScore = initial.calculateScore(request);
 		}
 
+		// trap the null-case really quick.
+		if (array == null) {
+			return bestChoice;
+		}
+
 		int score;
 		for (FERNObject object : array) {
 			score = object.calculateScore(request);
