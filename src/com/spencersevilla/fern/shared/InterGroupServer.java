@@ -378,10 +378,20 @@ class InterGroupThread extends Thread {
 			System.err.println("IGS error: header.getRcode = " + header.getRcode());
 			return errorMessage(query, Rcode.FORMERR);
 		}
-		if (header.getOpcode() != Opcode.QUERY) {
+
+		if (header.getOpcode() == Opcode.QUERY) {
+			return readQuery(query);
+		} else if (header.getOpcode() == Opcode.UPDATE) {
+			return readUpdate(query);
+		} else {
 			System.err.println("IGS error: header.getOpcode() = " + header.getOpcode());
 			return errorMessage(query, Rcode.NOTIMP);
 		}
+	}
+
+	byte[] readQuery(org.xbill.DNS.Message query) {
+		int maxLength = 0;
+		int flags = 0;
 
 		if (shouldForward(query)) {
 			System.err.println("IGS: queryRegularDNS()");
@@ -432,10 +442,63 @@ class InterGroupThread extends Thread {
 		return response.toWire(maxLength);
 	}
 
+	byte[] readUpdate(org.xbill.DNS.Message update) {
+		int maxLength = 0;
+		int flags = 0;
+
+		// ZONE section is same as QUERY section so this works the same
+		org.xbill.DNS.Record zoneRecord = update.getQuestion();
+		System.out.println("IGS: received update message for zone " + zoneRecord.getName());
+		Name name = new Name(zoneRecord.getName().toString());
+
+		OPTRecord queryOPT = update.getOPT();
+		if (socket != null) {
+			maxLength = 65535;
+		} else if (queryOPT != null) {
+			maxLength = Math.max(queryOPT.getPayloadSize(), 512);
+		} else {
+			maxLength = 512;
+		}
+
+		if (queryOPT != null && (queryOPT.getFlags() & ExtendedFlags.DO) != 0)
+			flags = FLAG_DNSSECOK;
+
+		// prep the response with DNS data and formatting
+		org.xbill.DNS.Message response = new org.xbill.DNS.Message(update.getHeader().getID());
+		response.getHeader().setOpcode(Opcode.UPDATE);
+		response.getHeader().setFlag(Flags.QR);
+
+		// per the RFC, we leave all content-fields as zero.
+		// All that's left to set is just the Rcode!
+
+
+		// somehow generate a Registration message here
+		Registration reg = new Registration(name);
+		org.xbill.DNS.Record[] records = update.getSectionArray(Section.UPDATE);
+		for (org.xbill.DNS.Record dnsrec : records) {
+			Record fernrec = InterGroupServer.fromDNSRecord(dnsrec);
+			reg.addRecord(fernrec);
+		}
+
+		// run it through our system to get an answer!
+		byte rcode = Rcode.NOERROR;
+		Response resp = mdns.resolveMessage(reg);
+
+		if (resp == null) {
+			return errorMessage(update, Rcode.NXDOMAIN);
+		}
+
+		if (resp.getRetVal() != Rcode.NOERROR) {
+			return errorMessage(update, resp.getRetVal());
+		}
+
+		response.getHeader().setRcode(Rcode.NOERROR);
+		return response.toWire(maxLength);
+	}
+
 	byte generateAnswer(org.xbill.DNS.Message query, org.xbill.DNS.Message response, int flags) {
 		org.xbill.DNS.Record queryRecord = query.getQuestion();
 		Name name = new Name(queryRecord.getName().toString());
-		// name.unfern();
 		Request request = new Request(name);
 
 		int type = queryRecord.getType();
