@@ -243,7 +243,12 @@ public class FERNManager {
 		// to it in order to facilitate caching! Note that we also
 		// still need to READ this response for other cached entries :-)
 		Response r = object.forwardMessage(message);
-		r.addOtherEntry(object);
+
+		if (message instanceof Request) {
+			// Registration-responses don't contain ANYTHING!
+			r.addOtherEntry(object);
+		}
+
 		return r;
 	}
 
