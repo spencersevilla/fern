@@ -7,12 +7,12 @@ import java.util.*;
 
 public class ServerGroupServer extends ServerGroup implements Runnable {
 	private HashMap<Name, FERNObject> objects;
-	private ArrayList<FERNObject> cacheList;
+	private HashMap<Name, FERNObject> cacheList;
 
 	public ServerGroupServer(FERNManager m, Name n, InetAddress a, int p) {
 			super(m, n, a, p);
 			objects = new HashMap<Name, FERNObject>();
-			cacheList = new ArrayList<FERNObject>();
+			cacheList = new HashMap<Name, FERNObject>();
 	}
 
 	public void start() {
@@ -43,7 +43,7 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 
 		// Since the tree is deterministic, we already know the next hop. Now
 		// let's go fishing in the cache and see if we can beat it!
-		FERNObject obj = findBestMatch(message, cacheList, initialObject);
+		FERNObject obj = findBestMatch(message, new ArrayList<FERNObject>(cacheList.values()), initialObject);
 
 		// if this is an exact match AND we allow it, we can respond directly
 		if (message.allowCacheResponse() && obj.isExactMatch(message)) {
@@ -95,29 +95,52 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 	}
 
 	public Response parseRegistration(Registration reg) {
-		Name key = findNextHop(reg);
-		if (key == null) {
-			System.out.println("SGServer " + name + " error: invalid findNextHop for request " + reg);
-			return null;
+		// Go through each record in turn. If it's one of ours, process it
+		// accordingly. If not, we can still add it to the cache!
+
+		for (Record r : reg.getRecordSet()) {
+			Name recname = r.getName();
+			Name pname = recname.getParent();
+
+
+			if (pname.equals(name)) {
+				// this record is a direct child of this group
+				addChildRecord(r);
+			} else {
+				// this record is NOT a child, so we can cache it
+				addCacheRecord(r);
+			}
 		}
 
-		FERNObject object = objects.get(key);
-		if (object != null) {
-			for (Record r : reg.getRecordSet()) {
-				object.addRecord(r);
-			}
-		} else {
-			object = new FERNObject(reg.getName());
-			for (Record r : reg.getRecordSet()) {
-				object.addRecord(r);
-			}
-			objects.put(key, object);
-		}
-
-		// GENERATE REGISTRATION-RESPONSE HERE!!!
 		return Registration.successfulResponse(reg);
 	}
 
+	private void addChildRecord(Record r) {
+		Name key = r.getName().firstTerm();
+
+		FERNObject object = objects.get(key);
+		if (object != null) {
+				object.addRecord(r);
+		} else {
+			object = new FERNObject(r.getName());
+			object.addRecord(r);
+			objects.put(key, object);
+		}
+		return;
+	}
+
+	private void addCacheRecord(Record r) {
+
+		FERNObject object = objects.get(r.getName());
+		if (object != null) {
+				object.addRecord(r);
+		} else {
+			object = new FERNObject(r.getName());
+			object.addRecord(r);
+			objects.put(r.getName(), object);
+		}
+		return;
+	}
 
 	public void registerObject(FERNObject object) {
 		System.out.println("SGServer " + name + " server: registering object " + object);

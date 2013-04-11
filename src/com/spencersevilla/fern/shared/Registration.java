@@ -17,7 +17,7 @@ public class Registration extends Message implements Serializable {
 	}
 
 	public ArrayList<Record> getRecordSet() {
-		return null;
+		return (ArrayList<Record>) recordSet.clone();
 	}
 
 	public static Response successfulResponse(Message m) {
