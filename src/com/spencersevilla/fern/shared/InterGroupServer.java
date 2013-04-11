@@ -173,7 +173,7 @@ public class InterGroupServer implements Runnable {
 		if (m instanceof Request) {
 			Request r = (Request) m;
 			return generateRequest(r);
-		} else if (m instanceof Request) {
+		} else if (m instanceof Registration) {
 			Registration r = (Registration) m;
 			return generateUpdate(r);
 		}
