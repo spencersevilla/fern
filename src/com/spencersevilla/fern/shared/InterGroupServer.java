@@ -254,22 +254,22 @@ public class InterGroupServer implements Runnable {
 	private static Response parseRegistrationResponse(org.xbill.DNS.Message response, Registration request) {
 		Header header = response.getHeader();
 
-		if (header.getRcode() == Rcode.NXDOMAIN) {
+		if (header.getRcode() == Rcode.REFUSED) {
 			// no error-alert here, this is a standard operation.
-			return null;
+			return Registration.unsuccessfulResponse(request);
 		}
 
 		if (header.getRcode() != Rcode.NOERROR) {
 			System.out.println("IGS error: header Rcode is " + header.getRcode());
-			return null;
+			return Registration.unsuccessfulResponse(request);
 		}
 
 		if (!header.getFlag(Flags.QR)) {
 			System.err.println("IGS error: response not a QR");
-			return null;
+			return Registration.unsuccessfulResponse(request);
 		}
 
-		return null;
+		return Registration.successfulResponse(request);
 	}
 
 	private static Response parseRecordSet(Request request, org.xbill.DNS.Record[] records) {
