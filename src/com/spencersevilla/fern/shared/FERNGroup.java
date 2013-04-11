@@ -239,9 +239,15 @@ public abstract class FERNGroup extends FERNObject {
 	}
 
 	public boolean isFinalGroup(Message message) {
-		Name parent_name = message.getName().getParent();
-		Message parent_message = new Message(parent_name);
-		return isExactMatch(parent_message);
+		Name n;
+		if (message instanceof Request) {
+			n = message.getName().getParent();
+		} else {
+			n = message.getName();
+		}
+
+		Message newmess = new Message(n);
+		return isExactMatch(newmess);
 	}
 
 	// 	FERNObject o = readMessage(message);
