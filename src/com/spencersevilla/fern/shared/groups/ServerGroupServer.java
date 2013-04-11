@@ -33,6 +33,7 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 		} else if (message instanceof Registration) {
 			return parseRegistration((Registration) message);
 		} else {
+			System.out.println("DEBUG: MESSAGE TYPE???");
 			return null;
 		}
 	}
@@ -95,6 +96,7 @@ public class ServerGroupServer extends ServerGroup implements Runnable {
 	}
 
 	public Response parseRegistration(Registration reg) {
+		System.out.println("DEBUG: PARSE REGISTRATION");
 		// Go through each record in turn. If it's one of ours, process it
 		// accordingly. If not, we can still add it to the cache!
 
